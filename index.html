@@ -90,45 +90,45 @@
     <img src="Cube_Logo_Final_Small.png" alt="The Cube Central Park logo">
     <h1>Event Request Form</h1>
   </header>
- <form id="leadForm" method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy">
+<form id="leadForm" method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy">
   <label>First Name</label>
-  <input name="first_name" required>
+  <input name="lead[first_name]" required>
 
   <label>Last Name</label>
-  <input name="last_name" required>
+  <input name="lead[last_name]" required>
 
   <label>Email</label>
-  <input type="email" name="email" required>
+  <input type="email" name="lead[email_address]" required>
 
-  <label>Phone</label>
-  <input name="phone">
+  <label>Phone Number</label>
+  <input name="lead[phone_number]" required>
 
   <label>Company</label>
-  <input name="company" required>
+  <input name="lead[company]" required>
 
   <label>Event Date (MM/DD/YY)</label>
-  <input name="event_date" required>
+  <input name="lead[event_date]" placeholder="MM/DD/YY" required>
 
   <label>Guest Count (min 50)</label>
-  <input name="guest_count" type="number" min="50" required>
+  <input type="number" name="lead[guest_count]" min="50" required>
 
   <label>Event Type</label>
-  <input name="event_type">
+  <input name="lead[event_type]">
 
   <label>Event Description</label>
-  <textarea name="event_description"></textarea>
+  <textarea name="lead[event_description]" required></textarea>
 
-  <label>Address</label>
-  <input name="address">
+  <label>Street Address</label>
+  <input name="lead[address1]">
 
   <label>City</label>
-  <input name="city">
+  <input name="lead[city]">
 
   <label>State</label>
-  <input name="state">
+  <input name="lead[state]" maxlength="2">
 
-  <label>Zip</label>
-  <input name="zip">
+  <label>ZIP Code</label>
+  <input name="lead[zip_code]">
 
   <button type="submit">Submit</button>
 </form>
