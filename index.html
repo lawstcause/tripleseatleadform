@@ -1,95 +1,98 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Event Request Form</title>
-  <style>
-    body {
-      font: 16px system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      padding: 2rem;
-      background: #f5f9fc;
-      color: #1a1a1a;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    header img {
-      height: 80px;
-      display: block;
-      margin: 0 auto 10px auto;
-    }
-    header h1 {
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: #004b7c;
-      margin: 0;
-    }
-    form {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px 30px;
-      border-radius: 10px;
-      background: white;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    }
-    label {
-      display: block;
-      margin-top: 14px;
-      font-weight: 500;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #cfd8dc;
-      border-radius: 6px;
-      margin-top: 6px;
-      font-size: 15px;
-    }
-    input:focus, textarea:focus {
-      border-color: #0077cc;
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.15);
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 16px;
-      border: 0;
-      border-radius: 6px;
-      background: #0077cc;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #005fa3;
-    }
-    .hint {
-      color: #5d738a;
-      font-size: 12px;
-      margin-top: 4px;
-    }
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 720px) {
-      .grid-3 {
-        grid-template-columns: 1fr;
+// netlify/functions/ts-proxy.js
+const https = require("https");
+const { URL } = require("url");
+
+const TS_URL = "https://api.tripleseat.com/v1/leads/create.js?lead_form_id=44948&public_key=b5c6a2f2358a55bfd720875530a3bcc44d2ec74d";
+
+function postUrlEncoded(targetUrl, bodyStr) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(targetUrl);
+    const options = {
+      method: "POST",
+      hostname: u.hostname,
+      path: u.pathname + u.search,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": Buffer.byteLength(bodyStr)
       }
-      button {
-        width: 100%;
-      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = "";
+      res.setEncoding("utf8");
+      res.on("data", (chunk) => (data += chunk));
+      res.on("end", () => resolve({ status: res.statusCode, body: data }));
+    });
+
+    req.on("error", reject);
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+exports.handler = async (event) => {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: JSON.stringify({ error: "POST only" }) };
+  }
+
+  try {
+    // Parse the incoming form body
+    const params = new URLSearchParams(event.body || "");
+
+    // Grab existing description (if any)
+    const currentDesc = params.get("lead[event_description]") || "";
+
+    // Collect address bits
+    const addr1 = (params.get("lead[address1]") || "").trim();
+    const city  = (params.get("lead[city]") || "").trim();
+    const state = (params.get("lead[state]") || "").trim();
+    const zip   = (params.get("lead[zip_code]") || "").trim();
+
+    // If user typed any address, append a nicely formatted block into description
+    if (addr1 || city || state || zip) {
+      const addressBlock = [
+        "----- Address -----",
+        addr1 ? `Street: ${addr1}` : null,
+        city || state || zip ? `City/State/ZIP: ${[city, state, zip].filter(Boolean).join(" ")}` : null,
+        "-------------------"
+      ].filter(Boolean).join("\n");
+
+      const combined = currentDesc
+        ? `${currentDesc}\n\n${addressBlock}`
+        : addressBlock;
+
+      params.set("lead[event_description]", combined);
     }
-  </style>
+
+    // Forward to TripleSeat
+    const ts = await postUrlEncoded(TS_URL, params.toString());
+
+    // TripleSeat responds with JSON
+    return {
+      statusCode: ts.status,
+      headers: { "Content-Type": "application/json" },
+      body: ts.body
+    };
+
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: false, errors: { base: [String(err)] } })
+    };
+  }
+};
 </head>
 <body>
   <header>
     <img src="Cube_Logo_Final_Small.png" alt="The Cube Central Park logo">
     <h1>Event Request Form</h1>
   </header>
+  <img class="logo" src="Cube_Logo_Final_Small.png" alt="The Cube">
+<h2>Event Request Form</h2>
 <!-- Empty form shell that actually submits -->
 <form id="leadForm" method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy"></form>
 
