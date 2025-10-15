@@ -90,48 +90,51 @@
     <img src="Cube_Logo_Final_Small.png" alt="The Cube Central Park logo">
     <h1>Event Request Form</h1>
   </header>
-<form id="leadForm" method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy">
-  <label>First Name</label>
-  <input name="lead[first_name]" required>
+<!-- Empty form shell that actually submits -->
+<form id="leadForm" method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy"></form>
 
-  <label>Last Name</label>
-  <input name="lead[last_name]" required>
+<!-- Fields can be anywhere on the page -->
+<label>First Name</label>
+<input form="leadForm" name="lead[first_name]" required>
 
-  <label>Email</label>
-  <input type="email" name="lead[email_address]" required>
+<label>Last Name</label>
+<input form="leadForm" name="lead[last_name]" required>
 
-  <label>Phone Number</label>
-  <input name="lead[phone_number]" required>
+<label>Email</label>
+<input form="leadForm" type="email" name="lead[email_address]" required>
 
-  <label>Company</label>
-  <input name="lead[company]" required>
+<label>Phone Number</label>
+<input form="leadForm" name="lead[phone_number]" required>
 
-  <label>Event Date (MM/DD/YY)</label>
-  <input name="lead[event_date]" placeholder="MM/DD/YY" required>
+<label>Company</label>
+<input form="leadForm" name="lead[company]" required>
 
-  <label>Guest Count (min 50)</label>
-  <input type="number" name="lead[guest_count]" min="50" required>
+<label>Event Date (MM/DD/YY)</label>
+<input form="leadForm" name="lead[event_date]" placeholder="MM/DD/YY" required>
 
-  <label>Event Type</label>
-  <input name="lead[event_type]">
+<label>Guest Count (min 50)</label>
+<input form="leadForm" type="number" name="lead[guest_count]" min="50" required>
 
-  <label>Event Description</label>
-  <textarea name="lead[event_description]" required></textarea>
+<label>Event Type</label>
+<input form="leadForm" name="lead[event_type]">
 
-  <label>Street Address</label>
-  <input name="lead[address1]">
+<label>Event Description</label>
+<textarea form="leadForm" name="lead[event_description]" required></textarea>
 
-  <label>City</label>
-  <input name="lead[city]">
+<label>Street Address</label>
+<input form="leadForm" name="lead[address1]">
 
-  <label>State</label>
-  <input name="lead[state]" maxlength="2">
+<label>City</label>
+<input form="leadForm" name="lead[city]">
 
-  <label>ZIP Code</label>
-  <input name="lead[zip_code]">
+<label>State</label>
+<input form="leadForm" name="lead[state]" maxlength="2">
 
-  <button type="submit">Submit</button>
-</form>
+<label>ZIP Code</label>
+<input form="leadForm" name="lead[zip_code]">
+
+<!-- The submit button must also target the same form -->
+<button form="leadForm" type="submit">Submit</button>
 
   <iframe name="ts_sink" style="display:none"></iframe>
 
