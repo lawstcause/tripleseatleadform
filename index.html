@@ -74,48 +74,48 @@
   <div class="container">
     <img class="logo" src="Cube_Logo_Final_Small.png" alt="The Cube">
     <h2>Event Request Form</h2>
-    <form id="leadForm">
-      <label for="firstName">First Name</label>
-      <input type="text" id="firstName" name="firstName" required>
+<form method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy">
+  <label>First Name</label>
+  <input type="text" name="lead[first_name]" required>
 
-      <label for="lastName">Last Name</label>
-      <input type="text" id="lastName" name="lastName" required>
+  <label>Last Name</label>
+  <input type="text" name="lead[last_name]" required>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
+  <label>Email</label>
+  <input type="email" name="lead[email_address]" required>
 
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" required>
+  <label>Phone Number</label>
+  <input type="text" name="lead[phone_number]" required>
 
-      <label for="company">Company</label>
-      <input type="text" id="company" name="company">
+  <label>Company</label>
+  <input type="text" name="lead[company]" required>
 
-      <label for="eventDate">Event Date (MM/DD/YY)</label>
-      <input type="text" id="eventDate" name="eventDate" placeholder="MM/DD/YY" required>
+  <label>Event Date (MM/DD/YY)</label>
+  <input type="text" name="lead[event_date]" placeholder="MM/DD/YY" required>
 
-      <label for="guestCount">Guest Count (min 50)</label>
-      <input type="number" id="guestCount" name="guestCount" min="50" required>
+  <label>Guest Count (min 50)</label>
+  <input type="number" name="lead[guest_count]" min="50" required>
 
-      <label for="address">Street Address</label>
-      <input type="text" id="address" name="address" placeholder="123 Example St">
+  <label>Street Address</label>
+  <input type="text" name="lead[address1]">
 
-      <label for="city">City</label>
-      <input type="text" id="city" name="city">
+  <label>City</label>
+  <input type="text" name="lead[city]">
 
-      <label for="state">State</label>
-      <input type="text" id="state" name="state">
+  <label>State</label>
+  <input type="text" name="lead[state]" maxlength="2" placeholder="CO">
 
-      <label for="zip">ZIP Code</label>
-      <input type="text" id="zip" name="zip">
+  <label>ZIP Code</label>
+  <input type="text" name="lead[zip_code]">
 
-      <label for="eventType">Event Type</label>
-      <input type="text" id="eventType" name="eventType">
+  <label>Event Type</label>
+  <input type="text" name="lead[event_type]">
 
-      <label for="eventDescription">Event Description</label>
-      <textarea id="eventDescription" name="eventDescription" rows="4" placeholder="Tell us about your event..."></textarea>
+  <label>Event Description</label>
+  <textarea name="lead[event_description]" required></textarea>
 
-      <button type="submit">Submit</button>
-    </form>
+  <button type="submit">Submit</button>
+</form>
   </div>
 </body>
 </html>
