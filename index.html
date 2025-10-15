@@ -90,58 +90,48 @@
     <img src="Cube_Logo_Final_Small.png" alt="The Cube Central Park logo">
     <h1>Event Request Form</h1>
   </header>
+ <form id="leadForm" method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy">
+  <label>First Name</label>
+  <input name="first_name" required>
 
-  <form id="leadForm" method="POST" target="ts_sink" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy">
-    <h2>Event Request</h2>
+  <label>Last Name</label>
+  <input name="last_name" required>
 
-    <label>First Name</label>
-    <input name="lead[first_name]" required>
+  <label>Email</label>
+  <input type="email" name="email" required>
 
-    <label>Last Name</label>
-    <input name="lead[last_name]" required>
+  <label>Phone</label>
+  <input name="phone">
 
-    <label>Email</label>
-    <input name="lead[email_address]" type="email" required>
+  <label>Company</label>
+  <input name="company" required>
 
-    <label>Phone Number</label>
-    <input name="lead[phone_number]" required>
+  <label>Event Date (MM/DD/YY)</label>
+  <input name="event_date" required>
 
-    <label>Company</label>
-    <input name="lead[company]" placeholder="Example: MCA Denver" required>
+  <label>Guest Count (min 50)</label>
+  <input name="guest_count" type="number" min="50" required>
 
-    <label>Event Date</label>
-    <input name="lead[event_date]" type="text" placeholder="MM/DD/YY" pattern="\d{2}/\d{2}/\d{2}" required>
-    <div class="hint">Format: MM/DD/YY</div>
+  <label>Event Type</label>
+  <input name="event_type">
 
-    <label>Guest Count</label>
-    <input name="lead[guest_count]" type="number" min="50" placeholder="50 or more" required>
-    <div class="hint">Minimum 50 guests</div>
+  <label>Event Description</label>
+  <textarea name="event_description"></textarea>
 
-    <label>Event Description</label>
-    <textarea name="lead[event_description]" rows="3" placeholder="Tell us what kind of event this is" required></textarea>
+  <label>Address</label>
+  <input name="address">
 
-    <hr>
+  <label>City</label>
+  <input name="city">
 
-    <label>Street Address</label>
-    <input name="lead[address1]" required>
+  <label>State</label>
+  <input name="state">
 
-    <div class="grid-3">
-      <div>
-        <label>City</label>
-        <input name="lead[city]" required>
-      </div>
-      <div>
-        <label>State (2 letters)</label>
-        <input name="lead[state]" maxlength="2" required>
-      </div>
-      <div>
-        <label>ZIP Code</label>
-        <input name="lead[zip_code]" pattern="[0-9]{5}(-[0-9]{4})?" required>
-      </div>
-    </div>
+  <label>Zip</label>
+  <input name="zip">
 
-    <button type="submit">Submit</button>
-  </form>
+  <button type="submit">Submit</button>
+</form>
 
   <iframe name="ts_sink" style="display:none"></iframe>
 
