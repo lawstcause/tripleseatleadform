@@ -1,168 +1,121 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-// netlify/functions/ts-proxy.js
-const https = require("https");
-const { URL } = require("url");
-
-const TS_URL = "https://api.tripleseat.com/v1/leads/create.js?lead_form_id=44948&public_key=b5c6a2f2358a55bfd720875530a3bcc44d2ec74d";
-
-function postUrlEncoded(targetUrl, bodyStr) {
-  return new Promise((resolve, reject) => {
-    const u = new URL(targetUrl);
-    const options = {
-      method: "POST",
-      hostname: u.hostname,
-      path: u.pathname + u.search,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": Buffer.byteLength(bodyStr)
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let data = "";
-      res.setEncoding("utf8");
-      res.on("data", (chunk) => (data += chunk));
-      res.on("end", () => resolve({ status: res.statusCode, body: data }));
-    });
-
-    req.on("error", reject);
-    req.write(bodyStr);
-    req.end();
-  });
-}
-
-exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "POST only" }) };
-  }
-
-  try {
-    // Parse the incoming form body
-    const params = new URLSearchParams(event.body || "");
-
-    // Grab existing description (if any)
-    const currentDesc = params.get("lead[event_description]") || "";
-
-    // Collect address bits
-    const addr1 = (params.get("lead[address1]") || "").trim();
-    const city  = (params.get("lead[city]") || "").trim();
-    const state = (params.get("lead[state]") || "").trim();
-    const zip   = (params.get("lead[zip_code]") || "").trim();
-
-    // If user typed any address, append a nicely formatted block into description
-    if (addr1 || city || state || zip) {
-      const addressBlock = [
-        "----- Address -----",
-        addr1 ? `Street: ${addr1}` : null,
-        city || state || zip ? `City/State/ZIP: ${[city, state, zip].filter(Boolean).join(" ")}` : null,
-        "-------------------"
-      ].filter(Boolean).join("\n");
-
-      const combined = currentDesc
-        ? `${currentDesc}\n\n${addressBlock}`
-        : addressBlock;
-
-      params.set("lead[event_description]", combined);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Cube Event Request</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #f5f8fb;
+      font-family: 'Inter', sans-serif;
+      color: #0f2840;
+      margin: 0;
+      padding: 0;
     }
-
-    // Forward to TripleSeat
-    const ts = await postUrlEncoded(TS_URL, params.toString());
-
-    // TripleSeat responds with JSON
-    return {
-      statusCode: ts.status,
-      headers: { "Content-Type": "application/json" },
-      body: ts.body
-    };
-
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, errors: { base: [String(err)] } })
-    };
-  }
-};
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(15,61,99,0.1);
+      padding: 40px;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 10px;
+      height: 80px;
+    }
+    h2 {
+      text-align: center;
+      color: #0f3d63;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-top: 15px;
+      color: #0f3d63;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #d6e3ef;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    input:focus, textarea:focus {
+      border-color: #0f66c1;
+      box-shadow: 0 0 0 3px rgba(15,102,193,0.15);
+      outline: none;
+    }
+    button {
+      background-color: #0f66c1;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      filter: brightness(1.05);
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <img src="Cube_Logo_Final_Small.png" alt="The Cube Central Park logo">
-    <h1>Event Request Form</h1>
-  </header>
-  <img class="logo" src="Cube_Logo_Final_Small.png" alt="The Cube">
-<h2>Event Request Form</h2>
-<!-- Empty form shell that actually submits -->
-<form id="leadForm" method="POST" action="https://mca-tripleseat-form.netlify.app/.netlify/functions/ts-proxy"></form>
+  <div class="container">
+    <img class="logo" src="Cube_Logo_Final_Small.png" alt="The Cube">
+    <h2>Event Request Form</h2>
+    <form id="leadForm">
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" name="firstName" required>
 
-<!-- Fields can be anywhere on the page -->
-<label>First Name</label>
-<input form="leadForm" name="lead[first_name]" required>
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" name="lastName" required>
 
-<label>Last Name</label>
-<input form="leadForm" name="lead[last_name]" required>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
 
-<label>Email</label>
-<input form="leadForm" type="email" name="lead[email_address]" required>
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" required>
 
-<label>Phone Number</label>
-<input form="leadForm" name="lead[phone_number]" required>
+      <label for="company">Company</label>
+      <input type="text" id="company" name="company">
 
-<label>Company</label>
-<input form="leadForm" name="lead[company]" required>
+      <label for="eventDate">Event Date (MM/DD/YY)</label>
+      <input type="text" id="eventDate" name="eventDate" placeholder="MM/DD/YY" required>
 
-<label>Event Date (MM/DD/YY)</label>
-<input form="leadForm" name="lead[event_date]" placeholder="MM/DD/YY" required>
+      <label for="guestCount">Guest Count (min 50)</label>
+      <input type="number" id="guestCount" name="guestCount" min="50" required>
 
-<label>Guest Count (min 50)</label>
-<input form="leadForm" type="number" name="lead[guest_count]" min="50" required>
+      <label for="address">Street Address</label>
+      <input type="text" id="address" name="address" placeholder="123 Example St">
 
-<label>Event Type</label>
-<input form="leadForm" name="lead[event_type]">
+      <label for="city">City</label>
+      <input type="text" id="city" name="city">
 
-<label>Event Description</label>
-<textarea form="leadForm" name="lead[event_description]" required></textarea>
+      <label for="state">State</label>
+      <input type="text" id="state" name="state">
 
-<label>Street Address</label>
-<input form="leadForm" name="lead[address1]">
+      <label for="zip">ZIP Code</label>
+      <input type="text" id="zip" name="zip">
 
-<label>City</label>
-<input form="leadForm" name="lead[city]">
+      <label for="eventType">Event Type</label>
+      <input type="text" id="eventType" name="eventType">
 
-<label>State</label>
-<input form="leadForm" name="lead[state]" maxlength="2">
+      <label for="eventDescription">Event Description</label>
+      <textarea id="eventDescription" name="eventDescription" rows="4" placeholder="Tell us about your event..."></textarea>
 
-<label>ZIP Code</label>
-<input form="leadForm" name="lead[zip_code]">
-
-<!-- The submit button must also target the same form -->
-<button form="leadForm" type="submit">Submit</button>
-
-  <iframe name="ts_sink" style="display:none"></iframe>
-
-  <script>
-  (function(){
-    var form = document.getElementById('leadForm');
-    if (!form) return;
-
-    form.addEventListener('submit', function(){
-      form.innerHTML = '<p>Sending your request...</p>';
-    });
-
-    var sink = document.getElementsByName('ts_sink')[0];
-    if (sink) {
-      sink.addEventListener('load', function(){
-        var msg = document.createElement('div');
-        msg.innerHTML = '<img src="Cube_Logo_Final_Small.png" alt="The Cube Central Park" style="height:80px; display:block; margin:0 auto 1rem;">' +
-                        '<h2 style="text-align:center; color:#004b7c;">Thanks for reaching out!</h2>' +
-                        '<p style="text-align:center;">Your request was submitted successfully. We’ll be in touch within 48 hours.</p>' +
-                        '<div style="text-align:center; margin-top:1rem;"><a href="/" style="background:#0077cc; color:#fff; padding:8px 14px; border-radius:5px; text-decoration:none;">Return to Home</a></div>';
-        var f = document.getElementById('leadForm');
-        if (f) { f.replaceWith(msg); }
-      });
-    }
-  })();
-  </script>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
 </body>
 </html>
