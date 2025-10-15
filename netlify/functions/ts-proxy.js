@@ -1,84 +1,56 @@
-// netlify/functions/ts-proxy.js
 const https = require("https");
 const { URL } = require("url");
 
-const TS_URL = "https://api.tripleseat.com/v1/leads/create.js?lead_form_id=44948&public_key=b5c6a2f2358a55bfd720875530a3bcc44d2ec74d";
+const TS_URL = "https://api.tripleseat.com/v1/leads/create.js?lead_form_id=44948&public_key=b5c6a2f358a55bfd720875530a3bcc44d2ec7d4";
 
-function postUrlEncoded(targetUrl, bodyStr) {
+function postUrlEncoded(targetUrl, params) {
   return new Promise((resolve, reject) => {
     const u = new URL(targetUrl);
+    const data = new URLSearchParams(params).toString();
     const options = {
       method: "POST",
       hostname: u.hostname,
       path: u.pathname + u.search,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Content-Length": Buffer.byteLength(bodyStr)
+        "Content-Length": Buffer.byteLength(data)
       }
     };
-
     const req = https.request(options, (res) => {
-      let data = "";
-      res.setEncoding("utf8");
-      res.on("data", (chunk) => (data += chunk));
-      res.on("end", () => resolve({ status: res.statusCode, body: data }));
+      let body = "";
+      res.on("data", (chunk) => (body += chunk));
+      res.on("end", () => resolve({ status: res.statusCode, body }));
     });
-
     req.on("error", reject);
-    req.write(bodyStr);
+    req.write(data);
     req.end();
   });
 }
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: JSON.stringify({ error: "POST only" }) };
+    return { statusCode: 405, body: "POST only" };
   }
 
   try {
-    // Parse the incoming form body
-    const params = new URLSearchParams(event.body || "");
+    const params = new URLSearchParams(event.body);
 
-    // Grab existing description (if any)
-    const currentDesc = params.get("lead[event_description]") || "";
+    // Build the address block for appending to description
+    const address = params.get("lead[address1]") || "";
+    const city = params.get("lead[city]") || "";
+    const state = params.get("lead[state]") || "";
+    const zip = params.get("lead[zip_code]") || "";
 
-    // Collect address bits
-    const addr1 = (params.get("lead[address1]") || "").trim();
-    const city  = (params.get("lead[city]") || "").trim();
-    const state = (params.get("lead[state]") || "").trim();
-    const zip   = (params.get("lead[zip_code]") || "").trim();
+    let desc = params.get("lead[event_description]") || "";
+    const addressBlock = `\n\nAddress:\n${address}\n${city}, ${state} ${zip}`;
+    desc += addressBlock;
 
-    // If user typed any address, append a nicely formatted block into description
-    if (addr1 || city || state || zip) {
-      const addressBlock = [
-        "----- Address -----",
-        addr1 ? `Street: ${addr1}` : null,
-        city || state || zip ? `City/State/ZIP: ${[city, state, zip].filter(Boolean).join(" ")}` : null,
-        "-------------------"
-      ].filter(Boolean).join("\n");
+    params.set("lead[event_description]", desc);
 
-      const combined = currentDesc
-        ? `${currentDesc}\n\n${addressBlock}`
-        : addressBlock;
-
-      params.set("lead[event_description]", combined);
-    }
-
-    // Forward to TripleSeat
-    const ts = await postUrlEncoded(TS_URL, params.toString());
-
-    // TripleSeat responds with JSON
-    return {
-      statusCode: ts.status,
-      headers: { "Content-Type": "application/json" },
-      body: ts.body
-    };
-
+    // Send to TripleSeat
+    const response = await postUrlEncoded(TS_URL, params);
+    return { statusCode: 200, body: response.body };
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, errors: { base: [String(err)] } })
-    };
+    return { statusCode: 500, body: `Error: ${err.message}` };
   }
 };
