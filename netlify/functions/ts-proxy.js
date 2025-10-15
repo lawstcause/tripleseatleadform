@@ -1,7 +1,7 @@
 const https = require("https");
 const { URL } = require("url");
 
-const TS_URL = "https://api.tripleseat.com/v1/leads/create.js?lead_form_id=44948&public_key=b5c6a2f358a55bfd720875530a3bcc44d2ec7d4";
+const TS_URL = "https://api.tripleseat.com/v1/leads/create.js?lead_form_id=44948&public_key=b5c6a2f2358a55bfd720875530a3bcc44d2ec74d";
 
 function postUrlEncoded(targetUrl, params) {
   return new Promise((resolve, reject) => {
