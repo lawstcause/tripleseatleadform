@@ -633,7 +633,7 @@ export default function App() {
               onClick={handleExportPdf}
               disabled={!canOutput || isExporting}
             >
-              {isExporting ? 'Exporting PDF z6' : 'Export PDF'}
+              {isExporting ? 'Exporting PDF...' : 'Export PDF'}
             </button>
             <button
               className="secondary-button"
