@@ -435,8 +435,10 @@ button {
 
 .label-time {
   margin-top: 0.09in;
-  width: 100%;
-  font-size: 0.23in;
+  width: calc(100% - 0.04in);
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 0.195in;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -456,7 +458,7 @@ button {
 
 .print-label--multi .label-time {
   margin-top: 0.05in;
-  font-size: 0.185in;
+  font-size: 0.16in;
 }
 
 .empty-preview {
