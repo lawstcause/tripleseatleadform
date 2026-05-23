@@ -1,0 +1,2380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MCA Seasonal Staff Badge Studio</title>
+  <link rel="icon" href="./mca-central-park-stack-black.png">
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg: #eef4f7;
+      --bg-accent: #dceaf0;
+      --panel: rgba(255, 255, 255, 0.97);
+      --panel-strong: #ffffff;
+      --text: #122230;
+      --muted: #5f7482;
+      --line: rgba(18, 34, 48, 0.12);
+      --line-strong: rgba(18, 34, 48, 0.2);
+      --brand: #0f6c81;
+      --brand-deep: #0a5566;
+      --shadow: 0 22px 60px rgba(17, 49, 63, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --danger: #b53c33;
+      --success: #1a8a62;
+      --warning: #a06b11;
+      --font-ui: "Avenir Next", "Trebuchet MS", sans-serif;
+      --font-display: "Arial Black", "Avenir Next Condensed", "Impact", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(ellipse at 16% 18%, rgba(255, 255, 255, 0.62) 0 5%, transparent 5.8%),
+        radial-gradient(ellipse at 38% 10%, rgba(255, 255, 255, 0.46) 0 4.4%, transparent 5.1%),
+        radial-gradient(ellipse at 62% 20%, rgba(255, 255, 255, 0.52) 0 5.2%, transparent 6%),
+        radial-gradient(ellipse at 84% 14%, rgba(255, 255, 255, 0.58) 0 5.8%, transparent 6.5%),
+        radial-gradient(ellipse at 24% 46%, rgba(255, 255, 255, 0.32) 0 5%, transparent 5.8%),
+        radial-gradient(ellipse at 70% 54%, rgba(255, 255, 255, 0.28) 0 4.6%, transparent 5.4%),
+        radial-gradient(ellipse at 48% 82%, rgba(255, 255, 255, 0.26) 0 5.2%, transparent 6%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0 2px, transparent 2px 56px),
+        linear-gradient(rgba(255, 255, 255, 0.22) 0 2px, transparent 2px 56px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.03)),
+        linear-gradient(180deg, #72d1e3 0%, #98dfeb 22%, #c7eff5 54%, #edfafd 100%);
+      color: var(--text);
+      font-family: var(--font-ui);
+      background-attachment: fixed;
+      background-size:
+        420px 240px,
+        360px 220px,
+        440px 250px,
+        460px 250px,
+        370px 220px,
+        390px 220px,
+        420px 250px,
+        56px 56px,
+        56px 56px,
+        auto,
+        auto;
+    }
+
+    body {
+      padding: 28px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+    }
+
+    .app-shell {
+      max-width: 1460px;
+      margin: 0 auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      padding: 28px 30px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(241, 252, 255, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -42% auto;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(73, 196, 223, 0.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.28), transparent 30%),
+        radial-gradient(circle at 12% 18%, rgba(90, 210, 235, 0.16), transparent 24%);
+      opacity: 0.9;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-branding {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero-logo {
+      display: block;
+      width: min(100%, 360px);
+      height: auto;
+      mix-blend-mode: multiply;
+      opacity: 0.96;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--brand);
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 3.45rem);
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p:last-child {
+      margin: 12px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .hero-stats {
+      display: grid;
+      gap: 12px;
+      min-width: 220px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(13, 90, 109, 0.92);
+      color: #ffffff;
+      box-shadow: 0 18px 35px rgba(15, 108, 129, 0.18);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.72;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 6px;
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(360px, 420px);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .editor-column,
+    .preview-column {
+      display: grid;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      padding: 24px 24px 0;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.45;
+    }
+
+    .camera-card {
+      padding-bottom: 24px;
+    }
+
+    .camera-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 320px);
+      gap: 20px;
+      padding: 20px 24px 0;
+    }
+
+    .camera-stage {
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      aspect-ratio: 4 / 3;
+      background:
+        linear-gradient(135deg, rgba(6, 28, 36, 0.88), rgba(36, 57, 68, 0.76)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.06), transparent 42%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .camera-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 0%, rgba(5, 20, 26, 0.12) 100%);
+      pointer-events: none;
+    }
+
+    .camera-video,
+    .camera-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #1d2930;
+    }
+
+    .camera-photo[hidden] {
+      display: none;
+    }
+
+    .camera-overlay {
+      position: absolute;
+      inset: 18px;
+      border-radius: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.24);
+      pointer-events: none;
+    }
+
+    .camera-guidance {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(8, 23, 29, 0.58);
+      color: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .camera-guidance strong {
+      display: block;
+      font-size: 0.94rem;
+      margin-bottom: 2px;
+    }
+
+    .camera-pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      white-space: nowrap;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .camera-sidebar {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .action-card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(244, 248, 250, 0.9);
+      border: 1px solid var(--line);
+    }
+
+    .action-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .action-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      min-height: 48px;
+      border-radius: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--brand), #0f8b6e);
+      color: #ffffff;
+      box-shadow: 0 16px 32px rgba(15, 108, 129, 0.22);
+    }
+
+    .button-primary:disabled {
+      background: #90acb5;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button-secondary {
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .button-danger {
+      background: rgba(181, 60, 51, 0.08);
+      color: var(--danger);
+      border: 1px solid rgba(181, 60, 51, 0.18);
+    }
+
+    .button-file {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button-file input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .status-line {
+      margin: 0;
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .status-line[data-state="error"] {
+      color: var(--danger);
+    }
+
+    .status-line[data-state="success"] {
+      color: var(--success);
+    }
+
+    .status-line[data-state="warning"] {
+      color: var(--warning);
+    }
+
+    .form-panel {
+      padding-bottom: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 18px;
+      padding: 20px 24px 0;
+    }
+
+    .name-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .field input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: rgba(15, 108, 129, 0.56);
+      box-shadow: 0 0 0 4px rgba(15, 108, 129, 0.12);
+    }
+
+    .pool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .pool-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--text);
+      text-align: left;
+      transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+    }
+
+    .pool-chip:hover {
+      border-color: rgba(15, 108, 129, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .pool-chip[aria-pressed="true"] {
+      border-color: rgba(15, 108, 129, 0.34);
+      background: linear-gradient(180deg, rgba(15, 108, 129, 0.08), rgba(255, 255, 255, 0.98));
+      box-shadow: inset 0 0 0 1px rgba(15, 108, 129, 0.08);
+    }
+
+    .pool-chip-icon {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(15, 108, 129, 0.05);
+    }
+
+    .pool-chip-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .pool-chip-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.15;
+    }
+
+    .pool-chip-color {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 6px 24px 0;
+    }
+
+    .preview-panel {
+      position: sticky;
+      top: 24px;
+      padding: 24px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .preview-shell {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      padding: 24px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(10, 70, 84, 0.05), rgba(255, 255, 255, 0.9)),
+        radial-gradient(circle at top, rgba(15, 108, 129, 0.14), transparent 36%);
+      border: 1px solid rgba(15, 108, 129, 0.08);
+    }
+
+    .preview-caption {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    .badge {
+      width: min(100%, 312px);
+      aspect-ratio: 3 / 4;
+      display: grid;
+      grid-template-rows: 58% 1fr auto;
+      overflow: hidden;
+      background: #ffffff;
+      border: 1px solid rgba(8, 24, 31, 0.08);
+      border-radius: 26px;
+      box-shadow: 0 22px 55px rgba(16, 39, 48, 0.16);
+      position: relative;
+    }
+
+    .badge--mini {
+      width: 136px;
+      border-radius: 16px;
+      box-shadow: 0 14px 28px rgba(16, 39, 48, 0.12);
+    }
+
+    .badge--sheet {
+      width: 1.5in;
+      height: 2in;
+      grid-template-rows: 54% 1fr auto;
+      border-radius: 0;
+      box-shadow: none;
+      border: 0;
+    }
+
+    .badge-photo-shell {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #cad8de, #e8eff2);
+    }
+
+    .badge-photo-shell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .badge-photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      color: #58707f;
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.75), transparent 46%),
+        linear-gradient(180deg, rgba(14, 104, 124, 0.14), rgba(255, 255, 255, 0.6));
+    }
+
+    .badge-photo-placeholder span {
+      display: block;
+      max-width: 12ch;
+      font-size: 0.95rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .badge-body {
+      display: grid;
+      gap: 10px;
+      align-content: center;
+      justify-items: center;
+      padding: 16px 14px 6px;
+    }
+
+    .badge-name {
+      width: 100%;
+      display: grid;
+      gap: 2px;
+      justify-items: center;
+      text-align: center;
+      line-height: 0.9;
+      text-transform: uppercase;
+      color: #0b1013;
+      font-family: var(--font-display);
+      letter-spacing: -0.04em;
+      font-size: 2.1rem;
+      word-break: break-word;
+    }
+
+    .badge-name span {
+      max-width: 100%;
+      display: block;
+      white-space: nowrap;
+    }
+
+    .badge-name--tight {
+      font-size: 1.7rem;
+    }
+
+    .badge-name--tighter {
+      font-size: 1.35rem;
+    }
+
+    .badge--mini .badge-body {
+      padding: 10px 8px 4px;
+      gap: 8px;
+    }
+
+    .badge--mini .badge-name {
+      font-size: 0.92rem;
+    }
+
+    .badge--mini .badge-name--tight {
+      font-size: 0.78rem;
+    }
+
+    .badge--mini .badge-name--tighter {
+      font-size: 0.68rem;
+    }
+
+    .badge--sheet .badge-body {
+      gap: 0.03in;
+      padding: 0.05in 0.06in 0.02in;
+    }
+
+    .badge--sheet .badge-name {
+      font-size: 0.22in;
+      line-height: 0.86;
+      letter-spacing: -0.016in;
+      word-break: normal;
+    }
+
+    .badge--sheet .badge-name--tight {
+      font-size: 0.19in;
+    }
+
+    .badge--sheet .badge-name--tighter {
+      font-size: 0.165in;
+      letter-spacing: -0.01in;
+    }
+
+    .badge-umbrellas {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 4px 10px 14px;
+      min-height: 42px;
+      flex-wrap: wrap;
+    }
+
+    .badge-umbrellas--empty {
+      color: #8aa0ac;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .badge--mini .badge-umbrellas {
+      min-height: 32px;
+      gap: 4px;
+      padding: 2px 6px 8px;
+    }
+
+    .badge--sheet .badge-umbrellas {
+      min-height: 0.16in;
+      gap: 0.02in;
+      padding: 0.01in 0.04in 0.05in;
+    }
+
+    .badge-meta {
+      display: grid;
+      gap: 8px;
+      padding: 18px 20px;
+      border-radius: 22px;
+      background: rgba(247, 251, 252, 0.98);
+      border: 1px solid var(--line);
+    }
+
+    .meta-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.92rem;
+    }
+
+    .meta-line strong {
+      font-size: 1rem;
+    }
+
+    .queue-panel {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .queue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+    }
+
+    .queue-header h2 {
+      margin: 0;
+      font-size: 1.22rem;
+      letter-spacing: -0.02em;
+    }
+
+    .queue-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .queue-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .download-ready {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(15, 108, 129, 0.12);
+      box-shadow: 0 10px 24px rgba(15, 108, 129, 0.08);
+    }
+
+    .download-ready[data-visible="true"] {
+      display: flex;
+    }
+
+    .download-ready-copy {
+      min-width: 0;
+    }
+
+    .download-ready-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .download-ready-text {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .download-ready-link {
+      flex: none;
+      text-decoration: none;
+    }
+
+    .queue-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .queue-empty {
+      padding: 26px;
+      border-radius: 22px;
+      border: 1px dashed rgba(15, 108, 129, 0.24);
+      background: rgba(247, 251, 252, 0.92);
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .queue-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 14px;
+      padding: 16px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      align-items: center;
+    }
+
+    .queue-item-copy {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .queue-item-title {
+      margin: 0;
+      font-size: 1.02rem;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .queue-item-pools {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .queue-item-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .helper-note {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(15, 108, 129, 0.06);
+      border: 1px solid rgba(15, 108, 129, 0.1);
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .helper-note strong {
+      color: var(--text);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 920px) {
+      body {
+        padding: 18px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-branding {
+        justify-content: center;
+      }
+
+      .camera-layout,
+      .name-grid,
+      .pool-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .panel-header,
+      .camera-layout,
+      .form-grid,
+      .queue-panel,
+      .preview-panel {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .hero {
+        padding: 22px;
+      }
+
+      .preview-shell {
+        padding: 18px;
+      }
+
+      .queue-item {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .download-ready {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .queue-item-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero panel">
+      <div class="hero-copy">
+        <div class="hero-branding">
+          <img
+            class="hero-logo"
+            src="./mca-central-park-stack-black.png"
+            alt="MCA Central Park"
+          >
+        </div>
+        <h1>Seasonal Staff Badge Studio</h1>
+        <p>Capture headshots, tag staff with one or more pool umbrellas, then export either a print-ready Avery sheet or a ZIP of standalone PNG badge backups.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="stat-label">Badges Queued</span>
+          <span class="stat-value" id="badgeCount">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Print Layout</span>
+          <span class="stat-value">5 x 4</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <div class="editor-column">
+        <section class="panel camera-card">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Camera Capture</h2>
+              <p class="panel-subtitle">Use the live camera for quick staff headshots, or drop in an uploaded photo if the browser blocks camera access.</p>
+            </div>
+          </div>
+          <div class="camera-layout">
+            <div class="camera-stage">
+              <video id="cameraVideo" class="camera-video" playsinline autoplay muted></video>
+              <img id="capturedPhoto" class="camera-photo" alt="Captured headshot preview" hidden>
+              <div class="camera-overlay"></div>
+              <div class="camera-guidance">
+                <div>
+                  <strong>Frame shoulders and face</strong>
+                  A centered head-and-shoulders crop matches the badge sample best.
+                </div>
+                <div class="camera-pill">Portrait Badge</div>
+              </div>
+            </div>
+
+            <div class="camera-sidebar">
+              <div class="action-card">
+                <h3>Live Camera</h3>
+                <p>Start the device camera, then freeze a frame when the staff member is lined up.</p>
+                <div class="button-row">
+                  <button id="startCameraButton" class="button button-primary" type="button">Start Camera</button>
+                  <button id="captureButton" class="button button-secondary" type="button" disabled>Capture Photo</button>
+                  <button id="retakeButton" class="button button-secondary" type="button" disabled>Retake</button>
+                </div>
+              </div>
+
+              <div class="action-card">
+                <h3>Upload Fallback</h3>
+                <p>If camera permissions are blocked, you can still build the badge using a local image file.</p>
+                <div class="button-row">
+                  <label class="button button-secondary button-file" for="photoUpload">
+                    Choose Photo
+                    <input id="photoUpload" type="file" accept="image/*">
+                  </label>
+                </div>
+              </div>
+
+              <p id="cameraStatus" class="status-line" aria-live="polite">Camera idle. Start the camera or upload an image to begin.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Staff Details</h2>
+              <p class="panel-subtitle">Enter the person’s name and select every pool umbrella they should carry on their badge.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="name-grid">
+              <div class="field">
+                <label for="firstName">First Name</label>
+                <input id="firstName" type="text" maxlength="24" placeholder="Silas" autocomplete="given-name">
+              </div>
+              <div class="field">
+                <label for="lastName">Last Name</label>
+                <input id="lastName" type="text" maxlength="30" placeholder="St. James" autocomplete="family-name">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Pool Umbrellas</label>
+              <div id="poolGrid" class="pool-grid" role="group" aria-label="Community pool umbrellas"></div>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <button id="addBadgeButton" class="button button-primary" type="button" disabled>Add Badge To Queue</button>
+            <button id="resetFormButton" class="button button-secondary" type="button">Reset Current Badge</button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="preview-column">
+        <section class="panel preview-panel">
+          <div>
+            <h2 class="panel-title">Live Badge Preview</h2>
+            <p class="panel-subtitle">This preview stays close to your reference badge and updates as you capture the photo, type the name, and toggle umbrellas.</p>
+          </div>
+
+          <div class="preview-shell">
+            <div id="liveBadgePreview"></div>
+            <p class="preview-caption">Badge size exported at <strong>1.5" x 2"</strong> in portrait layout for Avery Presta <strong>T00-1TD</strong>.</p>
+          </div>
+
+          <div class="badge-meta">
+            <div class="meta-line">
+              <span>Selected umbrellas</span>
+              <strong id="selectedPoolCount">0</strong>
+            </div>
+            <div class="meta-line">
+              <span>Badges ready to print</span>
+              <strong id="queuedBadgeCount">0</strong>
+            </div>
+            <div class="helper-note">
+              <strong>Exports:</strong> print uses a portrait 8.5" x 11" sheet with a 5 x 4 grid, and the PNG backup export downloads one ZIP containing a standalone image file for every queued badge.
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button id="exportButton" class="button button-primary" type="button" disabled>Export Avery Sheet</button>
+            <button id="exportPngButton" class="button button-secondary" type="button" disabled>Download PNG ZIP</button>
+            <button id="clearQueueButton" class="button button-danger" type="button" disabled>Clear Queue</button>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="panel queue-panel">
+      <div class="queue-header">
+        <div>
+          <h2>Queued Badge Set</h2>
+          <p>Create as many individual staff badges as you need. The export will flow them across pages in Avery order.</p>
+        </div>
+        <div class="queue-tools">
+          <button id="queueExportButton" class="button button-secondary" type="button" disabled>Open Print Sheet</button>
+          <button id="queueExportPngButton" class="button button-secondary" type="button" disabled>Download PNG ZIP</button>
+        </div>
+      </div>
+      <div id="downloadReady" class="download-ready" data-visible="false">
+        <div class="download-ready-copy">
+          <p class="download-ready-title">PNG ZIP Ready</p>
+          <p id="downloadReadyText" class="download-ready-text">Your backup ZIP is prepared. If the browser does not start the download automatically, use the button here.</p>
+        </div>
+        <a id="downloadReadyLink" class="button button-primary download-ready-link" href="#" download>Download ZIP Now</a>
+      </div>
+      <div id="queueContent"></div>
+    </section>
+  </div>
+
+  <canvas id="captureCanvas" class="sr-only" aria-hidden="true"></canvas>
+
+  <script>
+    const STORAGE_KEY = "cube-seasonal-badge-studio";
+    const SHEET_CONFIG = {
+      pageWidth: 8.5,
+      pageHeight: 11,
+      columns: 5,
+      rows: 4,
+      badgeWidth: 1.5,
+      badgeHeight: 2,
+      horizontalGap: 0.06,
+      verticalGap: 0.06,
+      paddingTop: 1.41,
+      paddingRight: 0.38,
+      paddingBottom: 1.41,
+      paddingLeft: 0.38
+    };
+
+    const POOLS = [
+      { id: "aviator", name: "Aviator", colorName: "Blue Umbrella", color: "#1f5fff" },
+      { id: "puddle-jumper", name: "Puddle Jumper", colorName: "Yellow Umbrella", color: "#f6c431" },
+      { id: "f-15", name: "F-15", colorName: "Teal Umbrella", color: "#17b7b5" },
+      { id: "jet-stream", name: "Jet Stream", colorName: "Orange Umbrella", color: "#ff8a32" },
+      { id: "runway-35", name: "Runway 35", colorName: "Purple Umbrella", color: "#7f54ff" },
+      { id: "maverick", name: "Maverick", colorName: "Red Umbrella", color: "#e24d4d" },
+      { id: "splash-landing", name: "Splash Landing", colorName: "Sky Blue Umbrella", color: "#58c8ff" }
+    ];
+
+    const state = {
+      badges: loadBadges(),
+      currentPhoto: "",
+      selectedPools: new Set(),
+      stream: null,
+      preparedZipUrl: ""
+    };
+
+    const elements = {
+      badgeCount: document.getElementById("badgeCount"),
+      queuedBadgeCount: document.getElementById("queuedBadgeCount"),
+      selectedPoolCount: document.getElementById("selectedPoolCount"),
+      poolGrid: document.getElementById("poolGrid"),
+      liveBadgePreview: document.getElementById("liveBadgePreview"),
+      queueContent: document.getElementById("queueContent"),
+      cameraVideo: document.getElementById("cameraVideo"),
+      capturedPhoto: document.getElementById("capturedPhoto"),
+      captureCanvas: document.getElementById("captureCanvas"),
+      cameraStatus: document.getElementById("cameraStatus"),
+      firstName: document.getElementById("firstName"),
+      lastName: document.getElementById("lastName"),
+      photoUpload: document.getElementById("photoUpload"),
+      startCameraButton: document.getElementById("startCameraButton"),
+      captureButton: document.getElementById("captureButton"),
+      retakeButton: document.getElementById("retakeButton"),
+      addBadgeButton: document.getElementById("addBadgeButton"),
+      resetFormButton: document.getElementById("resetFormButton"),
+      exportButton: document.getElementById("exportButton"),
+      exportPngButton: document.getElementById("exportPngButton"),
+      queueExportButton: document.getElementById("queueExportButton"),
+      queueExportPngButton: document.getElementById("queueExportPngButton"),
+      clearQueueButton: document.getElementById("clearQueueButton"),
+      downloadReady: document.getElementById("downloadReady"),
+      downloadReadyText: document.getElementById("downloadReadyText"),
+      downloadReadyLink: document.getElementById("downloadReadyLink")
+    };
+
+    function loadBadges() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveBadges() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.badges));
+      } catch (error) {
+        console.warn("Badge queue could not be persisted locally.", error);
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function normalizeName(value) {
+      return value.trim().replace(/\s+/g, " ");
+    }
+
+    function getSelectedPoolObjects() {
+      return POOLS.filter((pool) => state.selectedPools.has(pool.id));
+    }
+
+    function getNameClass(firstName, lastName, variant = "preview") {
+      const longest = Math.max(firstName.length, lastName.length);
+      if (variant === "sheet") {
+        if (longest >= 11) return "badge-name badge-name--tighter";
+        if (longest >= 8) return "badge-name badge-name--tight";
+        return "badge-name";
+      }
+      if (longest >= 15) return "badge-name badge-name--tighter";
+      if (longest >= 11) return "badge-name badge-name--tight";
+      return "badge-name";
+    }
+
+    function getDisplayNameParts() {
+      const firstName = normalizeName(elements.firstName.value) || "First";
+      const lastName = normalizeName(elements.lastName.value) || "Last";
+      return { firstName, lastName };
+    }
+
+    function setStatus(message, stateName = "") {
+      elements.cameraStatus.textContent = message;
+      elements.cameraStatus.dataset.state = stateName;
+    }
+
+    let umbrellaSvgInstance = 0;
+
+    function mixHexColor(baseHex, mixHex, amount) {
+      const normalizedAmount = Math.max(0, Math.min(1, amount));
+      const base = baseHex.replace("#", "");
+      const mix = mixHex.replace("#", "");
+      const baseRgb = [
+        parseInt(base.slice(0, 2), 16),
+        parseInt(base.slice(2, 4), 16),
+        parseInt(base.slice(4, 6), 16)
+      ];
+      const mixRgb = [
+        parseInt(mix.slice(0, 2), 16),
+        parseInt(mix.slice(2, 4), 16),
+        parseInt(mix.slice(4, 6), 16)
+      ];
+
+      const blended = baseRgb.map((channel, index) => {
+        const value = Math.round(channel + (mixRgb[index] - channel) * normalizedAmount);
+        return value.toString(16).padStart(2, "0");
+      });
+
+      return `#${blended.join("")}`;
+    }
+
+    function umbrellaSvg(pool, size = 30) {
+      const uid = `${pool.id.replace(/[^a-z0-9]/gi, "")}-${size}-${umbrellaSvgInstance += 1}`;
+      const topGradient = `umbrella-top-${uid}`;
+      const undersideGradient = `umbrella-under-${uid}`;
+      const poleGradient = `umbrella-pole-${uid}`;
+      const capGradient = `umbrella-cap-${uid}`;
+      const lightColor = mixHexColor(pool.color, "#ffffff", 0.35);
+      const strokeColor = mixHexColor(pool.color, "#083340", 0.22);
+      const ribColor = mixHexColor(pool.color, "#0a5964", 0.3);
+      const darkColor = mixHexColor(pool.color, "#061a20", 0.38);
+      const darkerColor = mixHexColor(pool.color, "#041014", 0.55);
+
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="${topGradient}" x1="18" y1="14" x2="45" y2="36" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="${lightColor}"></stop>
+              <stop offset="0.48" stop-color="${pool.color}"></stop>
+              <stop offset="1" stop-color="${darkColor}"></stop>
+            </linearGradient>
+            <linearGradient id="${undersideGradient}" x1="32" y1="28" x2="32" y2="38" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="${darkColor}"></stop>
+              <stop offset="1" stop-color="${darkerColor}"></stop>
+            </linearGradient>
+            <linearGradient id="${poleGradient}" x1="29" y1="27" x2="35" y2="55" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#3b3b3b"></stop>
+              <stop offset="0.35" stop-color="#080808"></stop>
+              <stop offset="0.68" stop-color="#222"></stop>
+              <stop offset="1" stop-color="#050505"></stop>
+            </linearGradient>
+            <radialGradient id="${capGradient}" cx="28" cy="20" r="18" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="${lightColor}"></stop>
+              <stop offset="0.55" stop-color="${pool.color}"></stop>
+              <stop offset="1" stop-color="${darkColor}"></stop>
+            </radialGradient>
+          </defs>
+          <path d="M11.2 28.4Q32 31.2 52.8 28.4L51.5 31.9Q32 34.7 12.5 31.9Z" fill="url(#${undersideGradient})"></path>
+          <path d="M8 27.8Q32 8.7 56 27.8Q54.4 30 52.8 28.4Q32 26.2 11.2 28.4Q9.6 30 8 27.8Z" fill="url(#${topGradient})" stroke="${strokeColor}" stroke-width="1.15" stroke-linejoin="round"></path>
+          <path d="M32 14.2L11.2 28.4" fill="none" stroke="${ribColor}" stroke-width="1.3" stroke-linecap="round"></path>
+          <path d="M32 14.2L21 27.1" fill="none" stroke="${ribColor}" stroke-width="1.25" stroke-linecap="round"></path>
+          <path d="M32 14.2L32 26.4" fill="none" stroke="${ribColor}" stroke-width="1.25" stroke-linecap="round"></path>
+          <path d="M32 14.2L43 27.1" fill="none" stroke="${ribColor}" stroke-width="1.25" stroke-linecap="round"></path>
+          <path d="M32 14.2L52.8 28.4" fill="none" stroke="${ribColor}" stroke-width="1.3" stroke-linecap="round"></path>
+          <path d="M11.2 28.4Q32 26.2 52.8 28.4" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="0.7" stroke-linecap="round"></path>
+          <path d="M31.65 11.05C31.78 9.7 32.22 8.95 32.35 11.05L32.72 12.1H31.28Z" fill="url(#${capGradient})" stroke="${strokeColor}" stroke-width="0.55" stroke-linejoin="round"></path>
+          <ellipse cx="32" cy="12.25" rx="1.15" ry="0.34" fill="url(#${capGradient})" stroke="${strokeColor}" stroke-width="0.5"></ellipse>
+          <rect x="30.8" y="28.2" width="2.4" height="28.2" rx="1.2" fill="url(#${poleGradient})"></rect>
+          <path d="M28.5 56.1H35.5" fill="none" stroke="#141414" stroke-width="1.8" stroke-linecap="round" opacity="0.72"></path>
+        </svg>
+      `;
+    }
+
+    function umbrellasMarkup(pools, size = 30) {
+      if (!pools.length) {
+        return '<div class="badge-umbrellas badge-umbrellas--empty">Select pool</div>';
+      }
+
+      return `
+        <div class="badge-umbrellas">
+          ${pools.map((pool) => `<span title="${escapeHtml(pool.name)}">${umbrellaSvg(pool, size)}</span>`).join("")}
+        </div>
+      `;
+    }
+
+    function badgeMarkup(badge, variant = "preview") {
+      const className = variant === "mini" ? "badge badge--mini" : variant === "sheet" ? "badge badge--sheet" : "badge";
+      const nameClass = getNameClass(badge.firstName, badge.lastName, variant);
+      const pools = POOLS.filter((pool) => badge.poolIds.includes(pool.id));
+      const umbrellaSize = variant === "sheet" ? 12 : variant === "mini" ? 18 : 28;
+
+      return `
+        <article class="${className}">
+          <div class="badge-photo-shell">
+            ${
+              badge.photo
+                ? `<img src="${badge.photo}" alt="${escapeHtml(`${badge.firstName} ${badge.lastName}`)}">`
+                : `<div class="badge-photo-placeholder"><span>Camera photo will appear here</span></div>`
+            }
+          </div>
+          <div class="badge-body">
+            <div class="${nameClass}">
+              <span>${escapeHtml(badge.firstName)}</span>
+              <span>${escapeHtml(badge.lastName)}</span>
+            </div>
+          </div>
+          ${umbrellasMarkup(pools, umbrellaSize)}
+        </article>
+      `;
+    }
+
+    function renderPoolButtons() {
+      elements.poolGrid.innerHTML = POOLS.map((pool) => {
+        const selected = state.selectedPools.has(pool.id);
+        return `
+          <button
+            type="button"
+            class="pool-chip"
+            data-pool-id="${pool.id}"
+            aria-pressed="${selected}"
+            title="${escapeHtml(pool.name)}"
+          >
+            <span class="pool-chip-icon">${umbrellaSvg(pool, 24)}</span>
+            <span class="pool-chip-copy">
+              <span class="pool-chip-name">${escapeHtml(pool.name)}</span>
+              <span class="pool-chip-color">${escapeHtml(pool.colorName)}</span>
+            </span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function renderLivePreview() {
+      const { firstName, lastName } = getDisplayNameParts();
+      const previewBadge = {
+        firstName,
+        lastName,
+        photo: state.currentPhoto,
+        poolIds: [...state.selectedPools]
+      };
+
+      elements.liveBadgePreview.innerHTML = badgeMarkup(previewBadge, "preview");
+      elements.selectedPoolCount.textContent = String(state.selectedPools.size);
+    }
+
+    function renderQueue() {
+      if (!state.badges.length) {
+        elements.queueContent.innerHTML = `
+          <div class="queue-empty">
+            No badges queued yet. Capture a headshot, enter a first and last name, choose the pool umbrellas, and add the badge to the queue.
+          </div>
+        `;
+      } else {
+        elements.queueContent.innerHTML = `
+          <div class="queue-grid">
+            ${state.badges.map((badge) => {
+              const poolNames = POOLS.filter((pool) => badge.poolIds.includes(pool.id)).map((pool) => pool.name).join(", ");
+              return `
+                <article class="queue-item">
+                  <div>${badgeMarkup(badge, "mini")}</div>
+                  <div class="queue-item-copy">
+                    <h3 class="queue-item-title">${escapeHtml(`${badge.firstName} ${badge.lastName}`)}</h3>
+                    <p class="queue-item-pools">${escapeHtml(poolNames || "No pool umbrellas selected")}</p>
+                    <div class="queue-item-actions">
+                      <button class="button button-danger" type="button" data-delete-id="${badge.id}">Remove</button>
+                    </div>
+                  </div>
+                </article>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+
+      const queueCount = state.badges.length;
+      if (queueCount === 0) {
+        hidePreparedDownload();
+      }
+      elements.badgeCount.textContent = String(queueCount);
+      elements.queuedBadgeCount.textContent = String(queueCount);
+      elements.exportButton.disabled = queueCount === 0;
+      elements.exportPngButton.disabled = queueCount === 0;
+      elements.queueExportButton.disabled = queueCount === 0;
+      elements.queueExportPngButton.disabled = queueCount === 0;
+      elements.clearQueueButton.disabled = queueCount === 0;
+    }
+
+    function updateCurrentPhotoPreview() {
+      if (state.currentPhoto) {
+        elements.capturedPhoto.src = state.currentPhoto;
+        elements.capturedPhoto.hidden = false;
+        elements.retakeButton.disabled = false;
+      } else {
+        elements.capturedPhoto.removeAttribute("src");
+        elements.capturedPhoto.hidden = true;
+        elements.retakeButton.disabled = true;
+      }
+      updateAddButtonState();
+      renderLivePreview();
+    }
+
+    function updateAddButtonState() {
+      const hasPhoto = Boolean(state.currentPhoto);
+      const hasFirst = normalizeName(elements.firstName.value).length > 0;
+      const hasLast = normalizeName(elements.lastName.value).length > 0;
+      const hasPool = state.selectedPools.size > 0;
+      elements.addBadgeButton.disabled = !(hasPhoto && hasFirst && hasLast && hasPool);
+    }
+
+    async function startCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setStatus("This browser does not support live camera capture. Use the upload fallback instead.", "warning");
+        return;
+      }
+
+      try {
+        if (state.stream) {
+          stopCamera();
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: "user",
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          }
+        });
+
+        state.stream = stream;
+        elements.cameraVideo.srcObject = stream;
+        await elements.cameraVideo.play();
+        elements.captureButton.disabled = false;
+        setStatus("Camera ready. Line up the staff member and click Capture Photo.", "success");
+      } catch (error) {
+        setStatus("Camera access was blocked or unavailable. You can still build badges with the upload fallback.", "error");
+      }
+    }
+
+    function stopCamera() {
+      if (!state.stream) return;
+      state.stream.getTracks().forEach((track) => track.stop());
+      state.stream = null;
+      elements.cameraVideo.srcObject = null;
+      elements.captureButton.disabled = true;
+    }
+
+    function capturePhoto() {
+      if (!elements.cameraVideo.videoWidth || !elements.cameraVideo.videoHeight) {
+        setStatus("The camera is not ready yet. Give it a second and try again.", "warning");
+        return;
+      }
+
+      const canvas = elements.captureCanvas;
+      canvas.width = elements.cameraVideo.videoWidth;
+      canvas.height = elements.cameraVideo.videoHeight;
+      const context = canvas.getContext("2d");
+      context.drawImage(elements.cameraVideo, 0, 0, canvas.width, canvas.height);
+      state.currentPhoto = canvas.toDataURL("image/jpeg", 0.92);
+      updateCurrentPhotoPreview();
+      setStatus("Photo captured. Review the preview or retake it if needed.", "success");
+    }
+
+    function clearCurrentBadge() {
+      elements.firstName.value = "";
+      elements.lastName.value = "";
+      state.selectedPools.clear();
+      state.currentPhoto = "";
+      elements.photoUpload.value = "";
+      renderPoolButtons();
+      updateCurrentPhotoPreview();
+      updateAddButtonState();
+      renderLivePreview();
+      setStatus("Current badge cleared. Capture the next headshot when you are ready.");
+    }
+
+    function addBadge() {
+      const firstName = normalizeName(elements.firstName.value);
+      const lastName = normalizeName(elements.lastName.value);
+
+      if (!state.currentPhoto || !firstName || !lastName || state.selectedPools.size === 0) {
+        setStatus("A photo, first name, last name, and at least one umbrella are required before adding a badge.", "warning");
+        updateAddButtonState();
+        return;
+      }
+
+      state.badges.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+        firstName,
+        lastName,
+        photo: state.currentPhoto,
+        poolIds: [...state.selectedPools]
+      });
+
+      saveBadges();
+      renderQueue();
+      clearCurrentBadge();
+      setStatus("Badge added to the queue. You can move straight to the next staff member.", "success");
+    }
+
+    function removeBadge(id) {
+      state.badges = state.badges.filter((badge) => badge.id !== id);
+      saveBadges();
+      renderQueue();
+    }
+
+    function clearQueue() {
+      if (!state.badges.length) return;
+      const confirmed = window.confirm("Clear every queued badge from this session?");
+      if (!confirmed) return;
+      state.badges = [];
+      saveBadges();
+      renderQueue();
+    }
+
+    function handleUpload(event) {
+      const [file] = event.target.files || [];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.currentPhoto = reader.result;
+        updateCurrentPhotoPreview();
+        setStatus("Photo loaded from file. You can add the badge once the name is filled in.", "success");
+      };
+      reader.onerror = () => {
+        setStatus("That photo could not be loaded. Try a different image file.", "error");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function togglePool(poolId) {
+      if (state.selectedPools.has(poolId)) {
+        state.selectedPools.delete(poolId);
+      } else {
+        state.selectedPools.add(poolId);
+      }
+      renderPoolButtons();
+      updateAddButtonState();
+      renderLivePreview();
+    }
+
+    function buildExportDocument() {
+      const badgesPerPage = SHEET_CONFIG.columns * SHEET_CONFIG.rows;
+      const pageCount = Math.ceil(state.badges.length / badgesPerPage);
+
+      const pagesMarkup = Array.from({ length: pageCount }, (_, pageIndex) => {
+        const pageBadges = state.badges.slice(pageIndex * badgesPerPage, (pageIndex + 1) * badgesPerPage);
+        const slots = Array.from({ length: badgesPerPage }, (_, slotIndex) => {
+          const badge = pageBadges[slotIndex];
+          return `<div class="sheet-slot">${badge ? badgeMarkup(badge, "sheet") : ""}</div>`;
+        }).join("");
+
+        return `<section class="sheet-page">${slots}</section>`;
+      }).join("");
+
+      return `
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Avery Badge Sheet</title>
+          <style>
+            * { box-sizing: border-box; }
+            html, body { margin: 0; padding: 0; background: #edf3f6; color: #122230; font-family: "Avenir Next", "Trebuchet MS", sans-serif; }
+            body { padding: 24px; }
+            .toolbar {
+              max-width: 8.5in;
+              margin: 0 auto 18px;
+              padding: 18px 20px;
+              border-radius: 20px;
+              background: rgba(255, 255, 255, 0.96);
+              box-shadow: 0 16px 40px rgba(16, 39, 48, 0.12);
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 14px;
+              flex-wrap: wrap;
+            }
+            .toolbar h1 {
+              margin: 0;
+              font-size: 1.1rem;
+              letter-spacing: -0.02em;
+            }
+            .toolbar p {
+              margin: 5px 0 0;
+              color: #5f7482;
+              font-size: 0.92rem;
+            }
+            .toolbar-buttons {
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+            }
+            .toolbar button {
+              border: 0;
+              border-radius: 14px;
+              padding: 12px 16px;
+              font: inherit;
+              font-weight: 700;
+              cursor: pointer;
+            }
+            .toolbar .primary {
+              background: linear-gradient(135deg, #0f6c81, #0f8b6e);
+              color: #fff;
+            }
+            .toolbar .secondary {
+              background: #fff;
+              color: #122230;
+              border: 1px solid rgba(18, 34, 48, 0.12);
+            }
+            .sheet-stack {
+              display: grid;
+              gap: 24px;
+              justify-content: center;
+            }
+            .sheet-page {
+              width: 8.5in;
+              height: 11in;
+              padding: ${SHEET_CONFIG.paddingTop}in ${SHEET_CONFIG.paddingRight}in ${SHEET_CONFIG.paddingBottom}in ${SHEET_CONFIG.paddingLeft}in;
+              display: grid;
+              grid-template-columns: repeat(${SHEET_CONFIG.columns}, ${SHEET_CONFIG.badgeWidth}in);
+              grid-template-rows: repeat(${SHEET_CONFIG.rows}, ${SHEET_CONFIG.badgeHeight}in);
+              column-gap: ${SHEET_CONFIG.horizontalGap}in;
+              row-gap: ${SHEET_CONFIG.verticalGap}in;
+              background: #fff;
+              box-shadow: 0 24px 60px rgba(16, 39, 48, 0.14);
+              position: relative;
+            }
+            .sheet-slot {
+              width: ${SHEET_CONFIG.badgeWidth}in;
+              height: ${SHEET_CONFIG.badgeHeight}in;
+              outline: 1px dashed rgba(18, 34, 48, 0.12);
+              outline-offset: -1px;
+            }
+            .badge {
+              width: 1.5in;
+              height: 2in;
+              display: grid;
+              grid-template-rows: 54% 1fr auto;
+              overflow: hidden;
+              background: #fff;
+            }
+            .badge-photo-shell {
+              background: linear-gradient(180deg, #cad8de, #eef4f7);
+            }
+            .badge-photo-shell img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              display: block;
+            }
+            .badge-photo-placeholder {
+              width: 100%;
+              height: 100%;
+              display: grid;
+              place-items: center;
+              text-align: center;
+              padding: 0.12in;
+              color: #58707f;
+              font-size: 0.14in;
+              line-height: 1.35;
+              font-weight: 700;
+              background: linear-gradient(180deg, rgba(14, 104, 124, 0.14), rgba(255, 255, 255, 0.6));
+            }
+            .badge-body {
+              display: grid;
+              align-content: center;
+              justify-items: center;
+              gap: 0.03in;
+              padding: 0.05in 0.06in 0.02in;
+            }
+            .badge-name {
+              width: 100%;
+              display: grid;
+              justify-items: center;
+              text-align: center;
+              line-height: 0.86;
+              text-transform: uppercase;
+              color: #0b1013;
+              font-family: "Arial Black", "Avenir Next Condensed", "Impact", sans-serif;
+              letter-spacing: -0.016in;
+              font-size: 0.22in;
+              word-break: normal;
+            }
+            .badge-name span {
+              display: block;
+              white-space: nowrap;
+            }
+            .badge-name--tight { font-size: 0.19in; }
+            .badge-name--tighter { font-size: 0.165in; letter-spacing: -0.01in; }
+            .badge-umbrellas {
+              display: flex;
+              justify-content: center;
+              gap: 0.02in;
+              padding: 0.01in 0.04in 0.05in;
+              flex-wrap: wrap;
+            }
+            .badge-umbrellas--empty {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 0.01in 0.04in 0.06in;
+              color: #8aa0ac;
+              font-size: 0.09in;
+              font-weight: 700;
+              letter-spacing: 0.01in;
+              text-transform: uppercase;
+            }
+            @page {
+              size: 8.5in 11in;
+              margin: 0;
+            }
+            @media print {
+              html, body { background: #fff; }
+              body { padding: 0; }
+              .toolbar { display: none; }
+              .sheet-stack { gap: 0; }
+              .sheet-page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+              }
+              .sheet-page:last-child {
+                page-break-after: auto;
+              }
+              .sheet-slot {
+                outline: none;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="toolbar">
+            <div>
+              <h1>Seasonal Staff Badge Sheet</h1>
+              <p>Prepared for Avery Presta T00-1TD in portrait orientation. Print at 100% scale with margins disabled.</p>
+            </div>
+            <div class="toolbar-buttons">
+              <button class="primary" onclick="window.print()">Print Sheet</button>
+              <button class="secondary" onclick="window.close()">Close</button>
+            </div>
+          </div>
+          <div class="sheet-stack">${pagesMarkup}</div>
+        </body>
+        </html>
+      `;
+    }
+
+    function exportSheet() {
+      if (!state.badges.length) return;
+      const exportWindow = window.open("", "_blank");
+      if (!exportWindow) {
+        setStatus("The export window was blocked. Allow pop-ups and try again.", "error");
+        return;
+      }
+      exportWindow.document.open();
+      exportWindow.document.write(buildExportDocument());
+      exportWindow.document.close();
+      exportWindow.focus();
+    }
+
+    function sanitizeFileName(value) {
+      return value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "badge";
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error(`Image failed to load: ${src.slice(0, 32)}`));
+        image.src = src;
+      });
+    }
+
+    function drawCoverImage(context, image, x, y, width, height) {
+      const scale = Math.max(width / image.width, height / image.height);
+      const drawWidth = image.width * scale;
+      const drawHeight = image.height * scale;
+      const drawX = x + (width - drawWidth) / 2;
+      const drawY = y + (height - drawHeight) / 2;
+      context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    }
+
+    function fitCanvasFontSize(context, lines, initialSize, minimumSize, maxWidth) {
+      let size = initialSize;
+      while (size > minimumSize) {
+        context.font = `900 ${size}px Arial Black, Avenir Next Condensed, Impact, sans-serif`;
+        const tooWide = lines.some((line) => context.measureText(line).width > maxWidth);
+        if (!tooWide) return size;
+        size -= 4;
+      }
+      return minimumSize;
+    }
+
+    function roundedRectPath(context, x, y, width, height, radius) {
+      const clampedRadius = Math.min(radius, width / 2, height / 2);
+      context.beginPath();
+      context.moveTo(x + clampedRadius, y);
+      context.lineTo(x + width - clampedRadius, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + clampedRadius);
+      context.lineTo(x + width, y + height - clampedRadius);
+      context.quadraticCurveTo(x + width, y + height, x + width - clampedRadius, y + height);
+      context.lineTo(x + clampedRadius, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - clampedRadius);
+      context.lineTo(x, y + clampedRadius);
+      context.quadraticCurveTo(x, y, x + clampedRadius, y);
+      context.closePath();
+    }
+
+    function drawPoolUmbrella(context, pool, x, y, size) {
+      const lightColor = mixHexColor(pool.color, "#ffffff", 0.35);
+      const strokeColor = mixHexColor(pool.color, "#083340", 0.22);
+      const ribColor = mixHexColor(pool.color, "#0a5964", 0.3);
+      const darkColor = mixHexColor(pool.color, "#061a20", 0.38);
+      const darkerColor = mixHexColor(pool.color, "#041014", 0.55);
+
+      context.save();
+      context.translate(x, y);
+
+      const scale = size / 64;
+      const canopyTopY = 14 * scale;
+      const canopyBottomY = 27.5 * scale;
+      const leftX = 7 * scale;
+      const rightX = 57 * scale;
+      const centerX = 32 * scale;
+
+      const undersideGradient = context.createLinearGradient(0, canopyBottomY - 2 * scale, 0, canopyBottomY + 8 * scale);
+      undersideGradient.addColorStop(0, darkColor);
+      undersideGradient.addColorStop(1, darkerColor);
+      context.fillStyle = undersideGradient;
+      context.beginPath();
+      context.moveTo(11 * scale, 28.4 * scale);
+      context.quadraticCurveTo(18 * scale, 18 * scale, centerX, 16 * scale);
+      context.quadraticCurveTo(46 * scale, 18 * scale, 52.9 * scale, 28.4 * scale);
+      context.lineTo(11 * scale, 28.4 * scale);
+      context.closePath();
+      context.fill();
+
+      const canopyGradient = context.createLinearGradient(14 * scale, 12 * scale, 50 * scale, 34 * scale);
+      canopyGradient.addColorStop(0, lightColor);
+      canopyGradient.addColorStop(0.5, pool.color);
+      canopyGradient.addColorStop(1, darkColor);
+
+      context.fillStyle = canopyGradient;
+      context.strokeStyle = strokeColor;
+      context.lineWidth = 1.2 * scale;
+      context.beginPath();
+      context.moveTo(leftX, canopyBottomY);
+      context.quadraticCurveTo(19 * scale, 15 * scale, centerX, canopyTopY);
+      context.quadraticCurveTo(45 * scale, 15 * scale, rightX, canopyBottomY);
+      context.quadraticCurveTo(55 * scale, 29.6 * scale, 52.4 * scale, 29.5 * scale);
+      context.bezierCurveTo(50.4 * scale, 29.4 * scale, 48.9 * scale, 28.7 * scale, 47.5 * scale, 28.0 * scale);
+      context.bezierCurveTo(46.1 * scale, 27.3 * scale, 44.7 * scale, 26.6 * scale, 43.0 * scale, 26.6 * scale);
+      context.bezierCurveTo(41.1 * scale, 26.6 * scale, 39.7 * scale, 27.3 * scale, 38.3 * scale, 28.0 * scale);
+      context.bezierCurveTo(36.9 * scale, 28.7 * scale, 35.5 * scale, 29.5 * scale, 33.6 * scale, 29.5 * scale);
+      context.bezierCurveTo(31.7 * scale, 29.5 * scale, 30.3 * scale, 28.7 * scale, 28.9 * scale, 28.0 * scale);
+      context.bezierCurveTo(27.5 * scale, 27.3 * scale, 26.1 * scale, 26.6 * scale, 24.2 * scale, 26.6 * scale);
+      context.bezierCurveTo(22.3 * scale, 26.6 * scale, 20.9 * scale, 27.3 * scale, 19.5 * scale, 28.0 * scale);
+      context.bezierCurveTo(18.1 * scale, 28.7 * scale, 16.7 * scale, 29.5 * scale, 14.8 * scale, 29.5 * scale);
+      context.bezierCurveTo(13.0 * scale, 29.5 * scale, 11.4 * scale, 28.8 * scale, 10.1 * scale, 27.4 * scale);
+      context.closePath();
+      context.fill();
+      context.stroke();
+
+      context.strokeStyle = ribColor;
+      context.lineWidth = 1.45 * scale;
+      context.lineCap = "round";
+      const ribAnchors = [
+        [14.1, 28],
+        [24, 28.1],
+        [40, 28.1],
+        [49.9, 28]
+      ];
+      ribAnchors.forEach(([ribX, ribY]) => {
+        context.beginPath();
+        context.moveTo(centerX, 14.8 * scale);
+        context.lineTo(ribX * scale, ribY * scale);
+        context.stroke();
+      });
+
+      context.strokeStyle = strokeColor;
+      context.lineWidth = 1.7 * scale;
+      context.beginPath();
+      context.moveTo(10.2 * scale, 27.8 * scale);
+      context.quadraticCurveTo(12.0 * scale, 31.4 * scale, 17.2 * scale, 27.8 * scale);
+      context.quadraticCurveTo(19.6 * scale, 31.5 * scale, 25.0 * scale, 27.8 * scale);
+      context.quadraticCurveTo(27.1 * scale, 31.5 * scale, 32.4 * scale, 27.8 * scale);
+      context.quadraticCurveTo(34.6 * scale, 31.5 * scale, 39.9 * scale, 27.8 * scale);
+      context.quadraticCurveTo(42.1 * scale, 31.5 * scale, 47.4 * scale, 27.8 * scale);
+      context.quadraticCurveTo(49.6 * scale, 31.4 * scale, 54.7 * scale, 27.8 * scale);
+      context.stroke();
+
+      context.strokeStyle = "rgba(255,255,255,0.7)";
+      context.lineWidth = 0.8 * scale;
+      context.beginPath();
+      context.moveTo(10.7 * scale, 27.25 * scale);
+      context.lineTo(53.3 * scale, 27.25 * scale);
+      context.stroke();
+
+      const capGradient = context.createRadialGradient(31.4 * scale, 10.9 * scale, 0.5 * scale, 32 * scale, 11.8 * scale, 2.2 * scale);
+      capGradient.addColorStop(0, lightColor);
+      capGradient.addColorStop(0.55, pool.color);
+      capGradient.addColorStop(1, darkColor);
+      context.fillStyle = capGradient;
+      context.strokeStyle = strokeColor;
+      context.lineWidth = 0.55 * scale;
+      context.beginPath();
+      context.moveTo(31.65 * scale, 11.05 * scale);
+      context.quadraticCurveTo(31.78 * scale, 9.7 * scale, 32 * scale, 9.15 * scale);
+      context.quadraticCurveTo(32.22 * scale, 9.7 * scale, 32.35 * scale, 11.05 * scale);
+      context.lineTo(32.72 * scale, 12.1 * scale);
+      context.lineTo(31.28 * scale, 12.1 * scale);
+      context.closePath();
+      context.fill();
+      context.stroke();
+      context.beginPath();
+      context.ellipse(32 * scale, 12.25 * scale, 1.15 * scale, 0.34 * scale, 0, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+
+      const poleGradient = context.createLinearGradient(30.6 * scale, 28.1 * scale, 33.4 * scale, 56.3 * scale);
+      poleGradient.addColorStop(0, "#3b3b3b");
+      poleGradient.addColorStop(0.35, "#080808");
+      poleGradient.addColorStop(0.68, "#222222");
+      poleGradient.addColorStop(1, "#050505");
+      context.fillStyle = poleGradient;
+      roundedRectPath(context, 30.6 * scale, 28.1 * scale, 2.8 * scale, 28.2 * scale, 1.4 * scale);
+      context.fill();
+
+      context.strokeStyle = "#141414";
+      context.lineWidth = 1.9 * scale;
+      context.beginPath();
+      context.moveTo(28.9 * scale, 56.2 * scale);
+      context.lineTo(35.1 * scale, 56.2 * scale);
+      context.stroke();
+
+      context.restore();
+    }
+
+    function drawPoolUmbrellaBase(context, pool, x, y, size) {
+      const lightColor = mixHexColor(pool.color, "#ffffff", 0.35);
+      const strokeColor = mixHexColor(pool.color, "#083340", 0.22);
+      const ribColor = mixHexColor(pool.color, "#0a5964", 0.3);
+      const darkColor = mixHexColor(pool.color, "#061a20", 0.38);
+      const darkerColor = mixHexColor(pool.color, "#041014", 0.55);
+
+      context.save();
+      context.translate(x, y);
+
+      const scale = size / 64;
+      const centerX = 32 * scale;
+      const seamLeftX = 11.2 * scale;
+      const seamRightX = 52.8 * scale;
+      const seamY = 28.4 * scale;
+
+      const undersideGradient = context.createLinearGradient(0, seamY, 0, 34 * scale);
+      undersideGradient.addColorStop(0, darkColor);
+      undersideGradient.addColorStop(1, darkerColor);
+      context.fillStyle = undersideGradient;
+      context.beginPath();
+      context.moveTo(seamLeftX, seamY);
+      context.quadraticCurveTo(centerX, 31.2 * scale, seamRightX, seamY);
+      context.lineTo(51.5 * scale, 31.9 * scale);
+      context.quadraticCurveTo(centerX, 34.7 * scale, 12.5 * scale, 31.9 * scale);
+      context.closePath();
+      context.fill();
+
+      const canopyGradient = context.createLinearGradient(14 * scale, 12 * scale, 50 * scale, 30 * scale);
+      canopyGradient.addColorStop(0, lightColor);
+      canopyGradient.addColorStop(0.5, pool.color);
+      canopyGradient.addColorStop(1, darkColor);
+      context.fillStyle = canopyGradient;
+      context.strokeStyle = strokeColor;
+      context.lineWidth = 1.15 * scale;
+      context.beginPath();
+      context.moveTo(8 * scale, 27.8 * scale);
+      context.quadraticCurveTo(centerX, 8.7 * scale, 56 * scale, 27.8 * scale);
+      context.quadraticCurveTo(54.4 * scale, 30 * scale, seamRightX, seamY);
+      context.quadraticCurveTo(centerX, 26.2 * scale, seamLeftX, seamY);
+      context.quadraticCurveTo(9.6 * scale, 30 * scale, 8 * scale, 27.8 * scale);
+      context.closePath();
+      context.fill();
+      context.stroke();
+
+      context.strokeStyle = ribColor;
+      context.lineWidth = 1.28 * scale;
+      context.lineCap = "round";
+      [
+        [11.2, 28.4],
+        [21, 27.1],
+        [32, 26.4],
+        [43, 27.1],
+        [52.8, 28.4]
+      ].forEach(([ribX, ribY]) => {
+        context.beginPath();
+        context.moveTo(centerX, 14.2 * scale);
+        context.lineTo(ribX * scale, ribY * scale);
+        context.stroke();
+      });
+
+      context.strokeStyle = "rgba(255,255,255,0.65)";
+      context.lineWidth = 0.7 * scale;
+      context.beginPath();
+      context.moveTo(seamLeftX, seamY);
+      context.quadraticCurveTo(centerX, 26.2 * scale, seamRightX, seamY);
+      context.stroke();
+
+      const capGradient = context.createRadialGradient(31.4 * scale, 10.9 * scale, 0.5 * scale, 32 * scale, 11.8 * scale, 2.2 * scale);
+      capGradient.addColorStop(0, lightColor);
+      capGradient.addColorStop(0.55, pool.color);
+      capGradient.addColorStop(1, darkColor);
+      context.fillStyle = capGradient;
+      context.strokeStyle = strokeColor;
+      context.lineWidth = 0.55 * scale;
+      context.beginPath();
+      context.moveTo(31.65 * scale, 11.05 * scale);
+      context.quadraticCurveTo(31.78 * scale, 9.7 * scale, 32 * scale, 9.15 * scale);
+      context.quadraticCurveTo(32.22 * scale, 9.7 * scale, 32.35 * scale, 11.05 * scale);
+      context.lineTo(32.72 * scale, 12.1 * scale);
+      context.lineTo(31.28 * scale, 12.1 * scale);
+      context.closePath();
+      context.fill();
+      context.stroke();
+      context.beginPath();
+      context.ellipse(32 * scale, 12.25 * scale, 1.15 * scale, 0.34 * scale, 0, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+
+      const poleGradient = context.createLinearGradient(30.8 * scale, 28.2 * scale, 33.2 * scale, 56.4 * scale);
+      poleGradient.addColorStop(0, "#3b3b3b");
+      poleGradient.addColorStop(0.35, "#080808");
+      poleGradient.addColorStop(0.68, "#222222");
+      poleGradient.addColorStop(1, "#050505");
+      context.fillStyle = poleGradient;
+      roundedRectPath(context, 30.8 * scale, 28.2 * scale, 2.4 * scale, 28.2 * scale, 1.2 * scale);
+      context.fill();
+
+      context.strokeStyle = "#141414";
+      context.lineWidth = 1.8 * scale;
+      context.beginPath();
+      context.moveTo(28.5 * scale, 56.1 * scale);
+      context.lineTo(35.5 * scale, 56.1 * scale);
+      context.stroke();
+
+      context.restore();
+    }
+
+    async function drawBadgeToCanvas(badge, options = {}) {
+      const width = options.width || 900;
+      const height = options.height || 1200;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, width, height);
+
+      const photoHeight = Math.round(height * 0.56);
+      if (badge.photo) {
+        try {
+          const image = await loadImage(badge.photo);
+          drawCoverImage(context, image, 0, 0, width, photoHeight);
+        } catch (error) {
+          context.fillStyle = "#d7e5ea";
+          context.fillRect(0, 0, width, photoHeight);
+        }
+      } else {
+        context.fillStyle = "#d7e5ea";
+        context.fillRect(0, 0, width, photoHeight);
+      }
+
+      const firstLine = badge.firstName.toUpperCase();
+      const secondLine = badge.lastName.toUpperCase();
+      const lineWidth = width - 120;
+      const fontSize = fitCanvasFontSize(context, [firstLine, secondLine], 138, 72, lineWidth);
+      const lineGap = Math.round(fontSize * 0.96);
+      const umbrellaZoneHeight = 150;
+      const textTop = photoHeight + 42;
+      const textBottom = height - umbrellaZoneHeight;
+      const totalTextHeight = lineGap * 2;
+      const firstBaseline = Math.round(textTop + ((textBottom - textTop - totalTextHeight) / 2) + fontSize * 0.78);
+      const secondBaseline = firstBaseline + lineGap;
+
+      context.fillStyle = "#0b1013";
+      context.textAlign = "center";
+      context.textBaseline = "alphabetic";
+      context.font = `900 ${fontSize}px Arial Black, Avenir Next Condensed, Impact, sans-serif`;
+      context.fillText(firstLine, width / 2, firstBaseline);
+      context.fillText(secondLine, width / 2, secondBaseline);
+
+      const pools = POOLS.filter((pool) => badge.poolIds.includes(pool.id));
+      if (pools.length) {
+        const iconSize = pools.length >= 5 ? 74 : pools.length >= 3 ? 82 : 92;
+        const gap = pools.length >= 5 ? 18 : 22;
+        const totalWidth = pools.length * iconSize + Math.max(0, pools.length - 1) * gap;
+        const startX = Math.round((width - totalWidth) / 2);
+        const iconY = height - 128;
+        pools.forEach((pool, index) => {
+          const x = startX + index * (iconSize + gap);
+          drawPoolUmbrellaBase(context, pool, x, iconY, iconSize);
+        });
+      }
+
+      return canvas;
+    }
+
+    function canvasToBlob(canvas) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("Canvas export failed."));
+          }
+        }, "image/png");
+      });
+    }
+
+    function revokePreparedZipUrl() {
+      if (!state.preparedZipUrl) return;
+      URL.revokeObjectURL(state.preparedZipUrl);
+      state.preparedZipUrl = "";
+    }
+
+    function hidePreparedDownload() {
+      revokePreparedZipUrl();
+      elements.downloadReady.dataset.visible = "false";
+      elements.downloadReadyLink.removeAttribute("href");
+      elements.downloadReadyLink.removeAttribute("download");
+    }
+
+    function showPreparedDownload(objectUrl, fileName) {
+      revokePreparedZipUrl();
+      state.preparedZipUrl = objectUrl;
+      elements.downloadReady.dataset.visible = "true";
+      elements.downloadReadyText.textContent = `Your backup ZIP is prepared as ${fileName}. If the browser does not start the download automatically, use the button here.`;
+      elements.downloadReadyLink.href = objectUrl;
+      elements.downloadReadyLink.download = fileName;
+      elements.downloadReadyLink.target = "_blank";
+      elements.downloadReadyLink.rel = "noopener";
+    }
+
+    function triggerPreparedDownload() {
+      requestAnimationFrame(() => {
+        elements.downloadReadyLink.click();
+      });
+    }
+
+    async function buildBadgePngZip() {
+      if (!window.JSZip) {
+        throw new Error("ZIP library failed to load.");
+      }
+
+      const zip = new window.JSZip();
+      for (const [index, badge] of state.badges.entries()) {
+        const canvas = await drawBadgeToCanvas(badge);
+        const blob = await canvasToBlob(canvas);
+        zip.file(`${String(index + 1).padStart(2, "0")}-${sanitizeFileName(`${badge.firstName}-${badge.lastName}`)}.png`, blob, {
+          binary: true,
+          date: new Date()
+        });
+      }
+      const zipBlob = await zip.generateAsync({
+        type: "blob",
+        compression: "DEFLATE",
+        compressionOptions: { level: 6 }
+      });
+
+      await window.JSZip.loadAsync(zipBlob);
+      return zipBlob;
+    }
+
+    async function requestZipSaveHandle(fileName) {
+      if (!("showSaveFilePicker" in window)) {
+        return null;
+      }
+
+      try {
+        return await window.showSaveFilePicker({
+          suggestedName: fileName,
+          startIn: "downloads",
+          types: [
+            {
+              description: "ZIP Archive",
+              accept: {
+                "application/zip": [".zip"]
+              }
+            }
+          ]
+        });
+      } catch (error) {
+        if (error && error.name === "AbortError") {
+          throw error;
+        }
+        console.warn("Save file picker is unavailable, falling back to browser download.", error);
+        return null;
+      }
+    }
+
+    async function writeBlobToHandle(fileHandle, blob) {
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    }
+
+    async function exportBadgePngs() {
+      if (!state.badges.length) return;
+
+      setStatus("Preparing standalone badge PNG backups...", "success");
+
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+        const fileName = `seasonal-badge-backups-${today}.zip`;
+        const zipBlob = await buildBadgePngZip();
+        let saveHandle = null;
+
+        try {
+          saveHandle = await requestZipSaveHandle(fileName);
+        } catch (error) {
+          if (error && error.name === "AbortError") {
+            setStatus("PNG ZIP export canceled.");
+            return;
+          }
+          throw error;
+        }
+
+        if (saveHandle) {
+          await writeBlobToHandle(saveHandle, zipBlob);
+          hidePreparedDownload();
+          setStatus(`Saved a ZIP with ${state.badges.length} standalone badge PNG backups.`, "success");
+          return;
+        }
+
+        const objectUrl = URL.createObjectURL(zipBlob);
+        showPreparedDownload(objectUrl, fileName);
+        triggerPreparedDownload();
+        setStatus(`PNG ZIP prepared for ${state.badges.length} badges. If the download did not start, use the Download ZIP Now button below.`, "success");
+      } catch (error) {
+        console.error(error);
+        hidePreparedDownload();
+        setStatus(`PNG ZIP export failed: ${error.message || "Unknown error"}`, "error");
+      }
+    }
+
+    function bindEvents() {
+      elements.startCameraButton.addEventListener("click", startCamera);
+      elements.captureButton.addEventListener("click", capturePhoto);
+      elements.retakeButton.addEventListener("click", () => {
+        state.currentPhoto = "";
+        updateCurrentPhotoPreview();
+        setStatus("Photo cleared. Capture another frame or upload a different image.");
+      });
+      elements.photoUpload.addEventListener("change", handleUpload);
+      elements.firstName.addEventListener("input", () => {
+        updateAddButtonState();
+        renderLivePreview();
+      });
+      elements.lastName.addEventListener("input", () => {
+        updateAddButtonState();
+        renderLivePreview();
+      });
+      elements.poolGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-pool-id]");
+        if (!button) return;
+        togglePool(button.dataset.poolId);
+      });
+      elements.addBadgeButton.addEventListener("click", addBadge);
+      elements.resetFormButton.addEventListener("click", clearCurrentBadge);
+      elements.exportButton.addEventListener("click", exportSheet);
+      elements.exportPngButton.addEventListener("click", exportBadgePngs);
+      elements.queueExportButton.addEventListener("click", exportSheet);
+      elements.queueExportPngButton.addEventListener("click", exportBadgePngs);
+      elements.clearQueueButton.addEventListener("click", clearQueue);
+      elements.queueContent.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-delete-id]");
+        if (!button) return;
+        removeBadge(button.dataset.deleteId);
+      });
+      window.addEventListener("beforeunload", () => {
+        stopCamera();
+        revokePreparedZipUrl();
+      });
+    }
+
+    function initialize() {
+      renderPoolButtons();
+      renderLivePreview();
+      renderQueue();
+      updateCurrentPhotoPreview();
+      updateAddButtonState();
+      bindEvents();
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
