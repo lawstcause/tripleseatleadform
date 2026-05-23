@@ -1272,6 +1272,9 @@
     }
 
     let umbrellaSvgInstance = 0;
+    const MASTER_UMBRELLA_VIEWBOX = "0 0 3000 3000";
+    const MASTER_UMBRELLA_PATH = "M 1535.9375 1177.148438 C 1590.054688 1159.222656 1672.113281 1135.910156 1774.289062 1122.863281 C 1860.21875 1111.839844 1920.5625 1113.101562 2068.101562 1115.710938 C 2130.214844 1116.804688 2247.957031 1118.910156 2418.472656 1121.6875 C 2427.5625 1096.941406 2436.652344 1072.113281 2445.742188 1047.371094 C 2466.699219 1070.347656 2487.570312 1093.40625 2508.527344 1116.382812 C 2571.480469 1070.261719 2628.460938 1037.777344 2672.058594 1015.472656 C 2735.429688 982.984375 2812.273438 944.4375 2919.414062 926.175781 C 2952.40625 920.535156 2980.179688 918.265625 2999.367188 917.167969 C 2957.621094 875.257812 2896.605469 815.835938 2820.101562 747.917969 C 2652.363281 599.03125 2534.703125 494.753906 2361.664062 399.566406 C 2140.230469 277.867188 1937.648438 231.492188 1791.792969 198.078125 C 1684.992188 173.671875 1594.261719 159.785156 1529.121094 151.539062 C 1516.917969 129.148438 1504.628906 106.761719 1492.425781 84.460938 C 1462.296875 90.015625 1432.164062 95.570312 1402.035156 101.125 C 1405.988281 121.742188 1409.945312 142.363281 1413.816406 162.898438 C 1348.589844 162.308594 1258.113281 166.097656 1152.488281 185.792969 C 1003.015625 213.648438 895.792969 259.601562 799.59375 301.515625 C 670.738281 357.738281 584.136719 395.441406 483.730469 473.039062 C 411.097656 529.09375 396.03125 556.027344 215.25 734.703125 C 147.496094 801.613281 91.359375 855.5625 54.664062 890.320312 C 8.039062 938.042969 0.210938 1005.878906 30.511719 1050.0625 C 58.367188 1090.714844 108.195312 1096.183594 116.777344 1097.027344 C 155.660156 1105.441406 213.648438 1115.878906 284.515625 1120.253906 C 407.476562 1127.914062 496.015625 1112.933594 534.144531 1108.386719 C 632.78125 1096.605469 780.066406 1107.96875 989.632812 1214.265625 C 1029.613281 1185.480469 1069.503906 1156.699219 1109.484375 1127.914062 C 1137.089844 1157.203125 1164.609375 1186.492188 1192.214844 1215.78125 C 1287.824219 1202.316406 1383.433594 1188.847656 1479.128906 1175.464844 C 1497.390625 1755.6875 1515.65625 2335.910156 1533.917969 2916.128906 C 1560.34375 2906.703125 1586.855469 2897.191406 1613.285156 2887.765625 C 1587.53125 2317.5625 1561.691406 1747.355469 1535.9375 1177.148438 Z M 1535.9375 1177.148438";
+    const MASTER_UMBRELLA_CANVAS_PATH = new Path2D(MASTER_UMBRELLA_PATH);
 
     function mixHexColor(baseHex, mixHex, amount) {
       const normalizedAmount = Math.max(0, Math.min(1, amount));
@@ -1296,54 +1299,29 @@
       return `#${blended.join("")}`;
     }
 
+    function getUmbrellaPalette(pool) {
+      return {
+        lightColor: mixHexColor(pool.color, "#ffffff", 0.28),
+        strokeColor: mixHexColor(pool.color, "#062631", 0.18),
+        darkColor: mixHexColor(pool.color, "#061a20", 0.22)
+      };
+    }
+
     function umbrellaSvg(pool, size = 30) {
       const uid = `${pool.id.replace(/[^a-z0-9]/gi, "")}-${size}-${umbrellaSvgInstance += 1}`;
-      const topGradient = `umbrella-top-${uid}`;
-      const undersideGradient = `umbrella-under-${uid}`;
-      const poleGradient = `umbrella-pole-${uid}`;
-      const capGradient = `umbrella-cap-${uid}`;
-      const lightColor = mixHexColor(pool.color, "#ffffff", 0.35);
-      const strokeColor = mixHexColor(pool.color, "#083340", 0.22);
-      const ribColor = mixHexColor(pool.color, "#0a5964", 0.3);
-      const darkColor = mixHexColor(pool.color, "#061a20", 0.38);
-      const darkerColor = mixHexColor(pool.color, "#041014", 0.55);
+      const fillGradient = `umbrella-fill-${uid}`;
+      const { lightColor, strokeColor, darkColor } = getUmbrellaPalette(pool);
 
       return `
-        <svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <svg width="${size}" height="${size}" viewBox="${MASTER_UMBRELLA_VIEWBOX}" aria-hidden="true" focusable="false">
           <defs>
-            <linearGradient id="${topGradient}" x1="18" y1="14" x2="45" y2="36" gradientUnits="userSpaceOnUse">
+            <linearGradient id="${fillGradient}" x1="980" y1="160" x2="1980" y2="2890" gradientUnits="userSpaceOnUse">
               <stop offset="0" stop-color="${lightColor}"></stop>
-              <stop offset="0.48" stop-color="${pool.color}"></stop>
+              <stop offset="0.58" stop-color="${pool.color}"></stop>
               <stop offset="1" stop-color="${darkColor}"></stop>
             </linearGradient>
-            <linearGradient id="${undersideGradient}" x1="32" y1="28" x2="32" y2="38" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="${darkColor}"></stop>
-              <stop offset="1" stop-color="${darkerColor}"></stop>
-            </linearGradient>
-            <linearGradient id="${poleGradient}" x1="29" y1="27" x2="35" y2="55" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="#3b3b3b"></stop>
-              <stop offset="0.35" stop-color="#080808"></stop>
-              <stop offset="0.68" stop-color="#222"></stop>
-              <stop offset="1" stop-color="#050505"></stop>
-            </linearGradient>
-            <radialGradient id="${capGradient}" cx="28" cy="20" r="18" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="${lightColor}"></stop>
-              <stop offset="0.55" stop-color="${pool.color}"></stop>
-              <stop offset="1" stop-color="${darkColor}"></stop>
-            </radialGradient>
           </defs>
-          <path d="M11.2 28.4Q32 31.2 52.8 28.4L51.5 31.9Q32 34.7 12.5 31.9Z" fill="url(#${undersideGradient})"></path>
-          <path d="M8 27.8Q32 8.7 56 27.8Q54.4 30 52.8 28.4Q32 26.2 11.2 28.4Q9.6 30 8 27.8Z" fill="url(#${topGradient})" stroke="${strokeColor}" stroke-width="1.15" stroke-linejoin="round"></path>
-          <path d="M32 14.2L11.2 28.4" fill="none" stroke="${ribColor}" stroke-width="1.3" stroke-linecap="round"></path>
-          <path d="M32 14.2L21 27.1" fill="none" stroke="${ribColor}" stroke-width="1.25" stroke-linecap="round"></path>
-          <path d="M32 14.2L32 26.4" fill="none" stroke="${ribColor}" stroke-width="1.25" stroke-linecap="round"></path>
-          <path d="M32 14.2L43 27.1" fill="none" stroke="${ribColor}" stroke-width="1.25" stroke-linecap="round"></path>
-          <path d="M32 14.2L52.8 28.4" fill="none" stroke="${ribColor}" stroke-width="1.3" stroke-linecap="round"></path>
-          <path d="M11.2 28.4Q32 26.2 52.8 28.4" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="0.7" stroke-linecap="round"></path>
-          <path d="M31.65 11.05C31.78 9.7 32.22 8.95 32.35 11.05L32.72 12.1H31.28Z" fill="url(#${capGradient})" stroke="${strokeColor}" stroke-width="0.55" stroke-linejoin="round"></path>
-          <ellipse cx="32" cy="12.25" rx="1.15" ry="0.34" fill="url(#${capGradient})" stroke="${strokeColor}" stroke-width="0.5"></ellipse>
-          <rect x="30.8" y="28.2" width="2.4" height="28.2" rx="1.2" fill="url(#${poleGradient})"></rect>
-          <path d="M28.5 56.1H35.5" fill="none" stroke="#141414" stroke-width="1.8" stroke-linecap="round" opacity="0.72"></path>
+          <path d="${MASTER_UMBRELLA_PATH}" fill="url(#${fillGradient})" stroke="${strokeColor}" stroke-width="1.05" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
         </svg>
       `;
     }
@@ -1889,242 +1867,35 @@
       context.closePath();
     }
 
-    function drawPoolUmbrella(context, pool, x, y, size) {
-      const lightColor = mixHexColor(pool.color, "#ffffff", 0.35);
-      const strokeColor = mixHexColor(pool.color, "#083340", 0.22);
-      const ribColor = mixHexColor(pool.color, "#0a5964", 0.3);
-      const darkColor = mixHexColor(pool.color, "#061a20", 0.38);
-      const darkerColor = mixHexColor(pool.color, "#041014", 0.55);
+    function drawMasterUmbrellaSilhouette(context, pool, x, y, size) {
+      const { lightColor, strokeColor, darkColor } = getUmbrellaPalette(pool);
+      const scale = size / 3000;
 
       context.save();
       context.translate(x, y);
+      context.scale(scale, scale);
 
-      const scale = size / 64;
-      const canopyTopY = 14 * scale;
-      const canopyBottomY = 27.5 * scale;
-      const leftX = 7 * scale;
-      const rightX = 57 * scale;
-      const centerX = 32 * scale;
-
-      const undersideGradient = context.createLinearGradient(0, canopyBottomY - 2 * scale, 0, canopyBottomY + 8 * scale);
-      undersideGradient.addColorStop(0, darkColor);
-      undersideGradient.addColorStop(1, darkerColor);
-      context.fillStyle = undersideGradient;
-      context.beginPath();
-      context.moveTo(11 * scale, 28.4 * scale);
-      context.quadraticCurveTo(18 * scale, 18 * scale, centerX, 16 * scale);
-      context.quadraticCurveTo(46 * scale, 18 * scale, 52.9 * scale, 28.4 * scale);
-      context.lineTo(11 * scale, 28.4 * scale);
-      context.closePath();
-      context.fill();
-
-      const canopyGradient = context.createLinearGradient(14 * scale, 12 * scale, 50 * scale, 34 * scale);
-      canopyGradient.addColorStop(0, lightColor);
-      canopyGradient.addColorStop(0.5, pool.color);
-      canopyGradient.addColorStop(1, darkColor);
-
-      context.fillStyle = canopyGradient;
-      context.strokeStyle = strokeColor;
-      context.lineWidth = 1.2 * scale;
-      context.beginPath();
-      context.moveTo(leftX, canopyBottomY);
-      context.quadraticCurveTo(19 * scale, 15 * scale, centerX, canopyTopY);
-      context.quadraticCurveTo(45 * scale, 15 * scale, rightX, canopyBottomY);
-      context.quadraticCurveTo(55 * scale, 29.6 * scale, 52.4 * scale, 29.5 * scale);
-      context.bezierCurveTo(50.4 * scale, 29.4 * scale, 48.9 * scale, 28.7 * scale, 47.5 * scale, 28.0 * scale);
-      context.bezierCurveTo(46.1 * scale, 27.3 * scale, 44.7 * scale, 26.6 * scale, 43.0 * scale, 26.6 * scale);
-      context.bezierCurveTo(41.1 * scale, 26.6 * scale, 39.7 * scale, 27.3 * scale, 38.3 * scale, 28.0 * scale);
-      context.bezierCurveTo(36.9 * scale, 28.7 * scale, 35.5 * scale, 29.5 * scale, 33.6 * scale, 29.5 * scale);
-      context.bezierCurveTo(31.7 * scale, 29.5 * scale, 30.3 * scale, 28.7 * scale, 28.9 * scale, 28.0 * scale);
-      context.bezierCurveTo(27.5 * scale, 27.3 * scale, 26.1 * scale, 26.6 * scale, 24.2 * scale, 26.6 * scale);
-      context.bezierCurveTo(22.3 * scale, 26.6 * scale, 20.9 * scale, 27.3 * scale, 19.5 * scale, 28.0 * scale);
-      context.bezierCurveTo(18.1 * scale, 28.7 * scale, 16.7 * scale, 29.5 * scale, 14.8 * scale, 29.5 * scale);
-      context.bezierCurveTo(13.0 * scale, 29.5 * scale, 11.4 * scale, 28.8 * scale, 10.1 * scale, 27.4 * scale);
-      context.closePath();
-      context.fill();
-      context.stroke();
-
-      context.strokeStyle = ribColor;
-      context.lineWidth = 1.45 * scale;
-      context.lineCap = "round";
-      const ribAnchors = [
-        [14.1, 28],
-        [24, 28.1],
-        [40, 28.1],
-        [49.9, 28]
-      ];
-      ribAnchors.forEach(([ribX, ribY]) => {
-        context.beginPath();
-        context.moveTo(centerX, 14.8 * scale);
-        context.lineTo(ribX * scale, ribY * scale);
-        context.stroke();
-      });
+      const fillGradient = context.createLinearGradient(980, 160, 1980, 2890);
+      fillGradient.addColorStop(0, lightColor);
+      fillGradient.addColorStop(0.58, pool.color);
+      fillGradient.addColorStop(1, darkColor);
+      context.fillStyle = fillGradient;
+      context.fill(MASTER_UMBRELLA_CANVAS_PATH);
 
       context.strokeStyle = strokeColor;
-      context.lineWidth = 1.7 * scale;
-      context.beginPath();
-      context.moveTo(10.2 * scale, 27.8 * scale);
-      context.quadraticCurveTo(12.0 * scale, 31.4 * scale, 17.2 * scale, 27.8 * scale);
-      context.quadraticCurveTo(19.6 * scale, 31.5 * scale, 25.0 * scale, 27.8 * scale);
-      context.quadraticCurveTo(27.1 * scale, 31.5 * scale, 32.4 * scale, 27.8 * scale);
-      context.quadraticCurveTo(34.6 * scale, 31.5 * scale, 39.9 * scale, 27.8 * scale);
-      context.quadraticCurveTo(42.1 * scale, 31.5 * scale, 47.4 * scale, 27.8 * scale);
-      context.quadraticCurveTo(49.6 * scale, 31.4 * scale, 54.7 * scale, 27.8 * scale);
-      context.stroke();
-
-      context.strokeStyle = "rgba(255,255,255,0.7)";
-      context.lineWidth = 0.8 * scale;
-      context.beginPath();
-      context.moveTo(10.7 * scale, 27.25 * scale);
-      context.lineTo(53.3 * scale, 27.25 * scale);
-      context.stroke();
-
-      const capGradient = context.createRadialGradient(31.4 * scale, 10.9 * scale, 0.5 * scale, 32 * scale, 11.8 * scale, 2.2 * scale);
-      capGradient.addColorStop(0, lightColor);
-      capGradient.addColorStop(0.55, pool.color);
-      capGradient.addColorStop(1, darkColor);
-      context.fillStyle = capGradient;
-      context.strokeStyle = strokeColor;
-      context.lineWidth = 0.55 * scale;
-      context.beginPath();
-      context.moveTo(31.65 * scale, 11.05 * scale);
-      context.quadraticCurveTo(31.78 * scale, 9.7 * scale, 32 * scale, 9.15 * scale);
-      context.quadraticCurveTo(32.22 * scale, 9.7 * scale, 32.35 * scale, 11.05 * scale);
-      context.lineTo(32.72 * scale, 12.1 * scale);
-      context.lineTo(31.28 * scale, 12.1 * scale);
-      context.closePath();
-      context.fill();
-      context.stroke();
-      context.beginPath();
-      context.ellipse(32 * scale, 12.25 * scale, 1.15 * scale, 0.34 * scale, 0, 0, Math.PI * 2);
-      context.fill();
-      context.stroke();
-
-      const poleGradient = context.createLinearGradient(30.6 * scale, 28.1 * scale, 33.4 * scale, 56.3 * scale);
-      poleGradient.addColorStop(0, "#3b3b3b");
-      poleGradient.addColorStop(0.35, "#080808");
-      poleGradient.addColorStop(0.68, "#222222");
-      poleGradient.addColorStop(1, "#050505");
-      context.fillStyle = poleGradient;
-      roundedRectPath(context, 30.6 * scale, 28.1 * scale, 2.8 * scale, 28.2 * scale, 1.4 * scale);
-      context.fill();
-
-      context.strokeStyle = "#141414";
-      context.lineWidth = 1.9 * scale;
-      context.beginPath();
-      context.moveTo(28.9 * scale, 56.2 * scale);
-      context.lineTo(35.1 * scale, 56.2 * scale);
-      context.stroke();
+      context.lineWidth = 54;
+      context.lineJoin = "round";
+      context.stroke(MASTER_UMBRELLA_CANVAS_PATH);
 
       context.restore();
     }
 
+    function drawPoolUmbrella(context, pool, x, y, size) {
+      drawMasterUmbrellaSilhouette(context, pool, x, y, size);
+    }
+
     function drawPoolUmbrellaBase(context, pool, x, y, size) {
-      const lightColor = mixHexColor(pool.color, "#ffffff", 0.35);
-      const strokeColor = mixHexColor(pool.color, "#083340", 0.22);
-      const ribColor = mixHexColor(pool.color, "#0a5964", 0.3);
-      const darkColor = mixHexColor(pool.color, "#061a20", 0.38);
-      const darkerColor = mixHexColor(pool.color, "#041014", 0.55);
-
-      context.save();
-      context.translate(x, y);
-
-      const scale = size / 64;
-      const centerX = 32 * scale;
-      const seamLeftX = 11.2 * scale;
-      const seamRightX = 52.8 * scale;
-      const seamY = 28.4 * scale;
-
-      const undersideGradient = context.createLinearGradient(0, seamY, 0, 34 * scale);
-      undersideGradient.addColorStop(0, darkColor);
-      undersideGradient.addColorStop(1, darkerColor);
-      context.fillStyle = undersideGradient;
-      context.beginPath();
-      context.moveTo(seamLeftX, seamY);
-      context.quadraticCurveTo(centerX, 31.2 * scale, seamRightX, seamY);
-      context.lineTo(51.5 * scale, 31.9 * scale);
-      context.quadraticCurveTo(centerX, 34.7 * scale, 12.5 * scale, 31.9 * scale);
-      context.closePath();
-      context.fill();
-
-      const canopyGradient = context.createLinearGradient(14 * scale, 12 * scale, 50 * scale, 30 * scale);
-      canopyGradient.addColorStop(0, lightColor);
-      canopyGradient.addColorStop(0.5, pool.color);
-      canopyGradient.addColorStop(1, darkColor);
-      context.fillStyle = canopyGradient;
-      context.strokeStyle = strokeColor;
-      context.lineWidth = 1.15 * scale;
-      context.beginPath();
-      context.moveTo(8 * scale, 27.8 * scale);
-      context.quadraticCurveTo(centerX, 8.7 * scale, 56 * scale, 27.8 * scale);
-      context.quadraticCurveTo(54.4 * scale, 30 * scale, seamRightX, seamY);
-      context.quadraticCurveTo(centerX, 26.2 * scale, seamLeftX, seamY);
-      context.quadraticCurveTo(9.6 * scale, 30 * scale, 8 * scale, 27.8 * scale);
-      context.closePath();
-      context.fill();
-      context.stroke();
-
-      context.strokeStyle = ribColor;
-      context.lineWidth = 1.28 * scale;
-      context.lineCap = "round";
-      [
-        [11.2, 28.4],
-        [21, 27.1],
-        [32, 26.4],
-        [43, 27.1],
-        [52.8, 28.4]
-      ].forEach(([ribX, ribY]) => {
-        context.beginPath();
-        context.moveTo(centerX, 14.2 * scale);
-        context.lineTo(ribX * scale, ribY * scale);
-        context.stroke();
-      });
-
-      context.strokeStyle = "rgba(255,255,255,0.65)";
-      context.lineWidth = 0.7 * scale;
-      context.beginPath();
-      context.moveTo(seamLeftX, seamY);
-      context.quadraticCurveTo(centerX, 26.2 * scale, seamRightX, seamY);
-      context.stroke();
-
-      const capGradient = context.createRadialGradient(31.4 * scale, 10.9 * scale, 0.5 * scale, 32 * scale, 11.8 * scale, 2.2 * scale);
-      capGradient.addColorStop(0, lightColor);
-      capGradient.addColorStop(0.55, pool.color);
-      capGradient.addColorStop(1, darkColor);
-      context.fillStyle = capGradient;
-      context.strokeStyle = strokeColor;
-      context.lineWidth = 0.55 * scale;
-      context.beginPath();
-      context.moveTo(31.65 * scale, 11.05 * scale);
-      context.quadraticCurveTo(31.78 * scale, 9.7 * scale, 32 * scale, 9.15 * scale);
-      context.quadraticCurveTo(32.22 * scale, 9.7 * scale, 32.35 * scale, 11.05 * scale);
-      context.lineTo(32.72 * scale, 12.1 * scale);
-      context.lineTo(31.28 * scale, 12.1 * scale);
-      context.closePath();
-      context.fill();
-      context.stroke();
-      context.beginPath();
-      context.ellipse(32 * scale, 12.25 * scale, 1.15 * scale, 0.34 * scale, 0, 0, Math.PI * 2);
-      context.fill();
-      context.stroke();
-
-      const poleGradient = context.createLinearGradient(30.8 * scale, 28.2 * scale, 33.2 * scale, 56.4 * scale);
-      poleGradient.addColorStop(0, "#3b3b3b");
-      poleGradient.addColorStop(0.35, "#080808");
-      poleGradient.addColorStop(0.68, "#222222");
-      poleGradient.addColorStop(1, "#050505");
-      context.fillStyle = poleGradient;
-      roundedRectPath(context, 30.8 * scale, 28.2 * scale, 2.4 * scale, 28.2 * scale, 1.2 * scale);
-      context.fill();
-
-      context.strokeStyle = "#141414";
-      context.lineWidth = 1.8 * scale;
-      context.beginPath();
-      context.moveTo(28.5 * scale, 56.1 * scale);
-      context.lineTo(35.5 * scale, 56.1 * scale);
-      context.stroke();
-
-      context.restore();
+      drawMasterUmbrellaSilhouette(context, pool, x, y, size);
     }
 
     async function drawBadgeToCanvas(badge, options = {}) {
