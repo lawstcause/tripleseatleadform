@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-const TIME_PATTERN = /^\d{4}$/;
-
 // Adjust these values if the thermal label stock or printer tolerances change later.
 const PRINT_LAYOUT = {
   // Each PDF/print page is one physical label.
@@ -24,6 +22,8 @@ const NAME_LAYOUT = {
     availableHeightIn: 0.68,
     gapBeforeTimeIn: 0.05,
     timeFontSizeMaxIn: 0.16,
+    timeFontSizeMinIn: 0.105,
+    timeFontSizeStepIn: 0.003,
   },
   standard: {
     fontSizeMaxIn: 0.235,
@@ -33,8 +33,11 @@ const NAME_LAYOUT = {
     availableHeightIn: 1.48,
     gapBeforeTimeIn: 0.09,
     timeFontSizeMaxIn: 0.195,
+    timeFontSizeMinIn: 0.12,
+    timeFontSizeStepIn: 0.003,
   },
 };
+const TIME_LINE_SIDE_INSET_IN = 0.04;
 
 function getTodayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -72,23 +75,76 @@ function createDay(date = getTodayISO()) {
   };
 }
 
-function sanitizeTimeInput(value) {
-  return value.replace(/\D/g, '').slice(0, 4);
+function formatMinutesAsClockTime(totalMinutes) {
+  const hours24 = Math.floor(totalMinutes / 60) % 24;
+  const minutes = totalMinutes % 60;
+  const meridiem = hours24 >= 12 ? 'PM' : 'AM';
+  const hours12 = hours24 % 12 || 12;
+
+  return `${hours12}:${String(minutes).padStart(2, '0')} ${meridiem}`;
 }
 
-function parseMilitaryTime(value) {
-  if (!TIME_PATTERN.test(value)) {
+function parseClockTime(value) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
     return null;
   }
 
-  const hours = Number(value.slice(0, 2));
-  const minutes = Number(value.slice(2, 4));
+  const normalized = trimmed
+    .toUpperCase()
+    .replace(/\./g, '')
+    .replace(/\s+/g, ' ');
 
-  if (hours > 23 || minutes > 59) {
+  const meridiemMatch = normalized.match(/(AM|PM)$/);
+
+  if (!meridiemMatch) {
     return null;
   }
 
-  return hours * 60 + minutes;
+  const meridiem = meridiemMatch[1];
+  const timePart = normalized.slice(0, normalized.length - meridiem.length).trim();
+
+  let hoursText = '';
+  let minutesText = '';
+
+  if (/^\d{1,2}:\d{2}$/.test(timePart)) {
+    [hoursText, minutesText] = timePart.split(':');
+  } else if (/^\d{1,2}$/.test(timePart)) {
+    hoursText = timePart;
+    minutesText = '00';
+  } else if (/^\d{3,4}$/.test(timePart)) {
+    hoursText = timePart.slice(0, -2);
+    minutesText = timePart.slice(-2);
+  } else {
+    return null;
+  }
+
+  const hours = Number(hoursText);
+  const minutes = Number(minutesText);
+
+  if (hours < 1 || hours > 12 || minutes > 59) {
+    return null;
+  }
+
+  const hours24 = (hours % 12) + (meridiem === 'PM' ? 12 : 0);
+  const totalMinutes = hours24 * 60 + minutes;
+
+  return {
+    totalMinutes,
+    display: formatMinutesAsClockTime(totalMinutes),
+  };
+}
+
+function normalizeTimeInput(value) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return '';
+  }
+
+  const parsed = parseClockTime(trimmed);
+  return parsed ? parsed.display : trimmed;
 }
 
 function formatDateHeading(value) {
@@ -126,8 +182,10 @@ function getEventIssues(day, event) {
   }
 
   const issues = [];
-  const startMinutes = parseMilitaryTime(event.startTime);
-  const endMinutes = parseMilitaryTime(event.endTime);
+  const parsedStart = parseClockTime(event.startTime);
+  const parsedEnd = parseClockTime(event.endTime);
+  const startMinutes = parsedStart?.totalMinutes ?? null;
+  const endMinutes = parsedEnd?.totalMinutes ?? null;
 
   if (!day.date) {
     issues.push('Choose a date for this event.');
@@ -138,11 +196,11 @@ function getEventIssues(day, event) {
   }
 
   if (startMinutes === null) {
-    issues.push('Start time must be four digits from 0000 to 2359.');
+    issues.push('Start time must be a valid 12-hour time like 9:00 AM.');
   }
 
   if (endMinutes === null) {
-    issues.push('End time must be four digits from 0000 to 2359.');
+    issues.push('End time must be a valid 12-hour time like 1:00 PM.');
   }
 
   if (startMinutes !== null && endMinutes !== null && endMinutes <= startMinutes) {
@@ -256,6 +314,43 @@ function getEventNameLayout(eventName, compact, ctx) {
   };
 }
 
+function getEventTimeLayout(startTime, endTime, compact, ctx) {
+  const layoutKey = compact ? 'compact' : 'standard';
+  const settings = NAME_LAYOUT[layoutKey];
+  const timeText = `${startTime} - ${endTime}`;
+  const contentLeftIn = compact ? 0.16 : 0.18;
+  const contentRightInsetIn = compact ? 0.16 : 0.17;
+  const maxWidthIn =
+    PRINT_LAYOUT.labelWidthIn - contentLeftIn - contentRightInsetIn - TIME_LINE_SIDE_INSET_IN;
+
+  if (!ctx) {
+    return {
+      text: timeText,
+      fontSizeIn: settings.timeFontSizeMaxIn,
+    };
+  }
+
+  let fontSizeIn = settings.timeFontSizeMaxIn;
+
+  while (fontSizeIn >= settings.timeFontSizeMinIn) {
+    ctx.font = `600 ${fontSizeIn * TEXT_MEASURE_DPI}px ${LABEL_FONT_FAMILY}`;
+
+    if (ctx.measureText(timeText).width <= maxWidthIn * TEXT_MEASURE_DPI) {
+      return {
+        text: timeText,
+        fontSizeIn,
+      };
+    }
+
+    fontSizeIn -= settings.timeFontSizeStepIn;
+  }
+
+  return {
+    text: timeText,
+    fontSizeIn: settings.timeFontSizeMinIn,
+  };
+}
+
 function drawLabelEventOnCanvas(ctx, event, x, topPx, compact) {
   const toPx = (inches) => inches * PRINT_LAYOUT.pdfDpi;
   const labelWidth = toPx(PRINT_LAYOUT.labelWidthIn);
@@ -263,11 +358,8 @@ function drawLabelEventOnCanvas(ctx, event, x, topPx, compact) {
   const contentLeft = x + toPx(compact ? 0.16 : 0.18);
   const contentRight = x + labelWidth - toPx(compact ? 0.16 : 0.17);
   const nameX = contentLeft + circleSize + toPx(0.08);
-  const nameMaxWidth = contentRight - nameX;
-  const minTimeFontSize = toPx(compact ? 0.145 : 0.165);
-  const timeMaxWidth = contentRight - contentLeft;
-  const timeText = `${event.startTime} - ${event.endTime}`;
   const nameLayout = getEventNameLayout(event.name, compact, ctx);
+  const timeLayout = getEventTimeLayout(event.startTime, event.endTime, compact, ctx);
   const gapBeforeTimePx = toPx(compact ? NAME_LAYOUT.compact.gapBeforeTimeIn : NAME_LAYOUT.standard.gapBeforeTimeIn);
   const nameTopPx = topPx + toPx(0.01);
 
@@ -296,17 +388,11 @@ function drawLabelEventOnCanvas(ctx, event, x, topPx, compact) {
   });
 
   ctx.textAlign = 'center';
-  let timeFontSize = toPx(compact ? 0.16 : 0.195);
-  ctx.font = `600 ${timeFontSize}px ${LABEL_FONT_FAMILY}`;
-
-  while (ctx.measureText(timeText).width > timeMaxWidth && timeFontSize > minTimeFontSize) {
-    timeFontSize -= toPx(0.005);
-    ctx.font = `600 ${timeFontSize}px ${LABEL_FONT_FAMILY}`;
-  }
+  ctx.font = `600 ${timeLayout.fontSizeIn * PRINT_LAYOUT.pdfDpi}px ${LABEL_FONT_FAMILY}`;
 
   ctx.fillText(
-    timeText,
-    contentLeft + timeMaxWidth / 2,
+    timeLayout.text,
+    contentLeft + (contentRight - contentLeft) / 2,
     nameTopPx +
       nameLayout.lines.length * (nameLayout.lineHeightIn * PRINT_LAYOUT.pdfDpi) +
       gapBeforeTimePx,
@@ -368,8 +454,11 @@ function PreviewPage({ label, pageNumber }) {
                       ))}
                     </span>
                   </div>
-                  <div className="label-time">
-                    {event.startTime} - {event.endTime}
+                  <div
+                    className="label-time"
+                    style={{ fontSize: `${event.timeLayout.fontSizeIn}in` }}
+                  >
+                    {event.timeLayout.text}
                   </div>
                 </div>
               ))}
@@ -424,13 +513,19 @@ export default function App() {
         .flatMap((day) => {
           const printableEvents = day.events
             .filter((event) => isPrintableEvent(day, event))
-            .map((event) => ({
-              id: event.id,
-              name: event.name.trim(),
-              startTime: event.startTime,
-              endTime: event.endTime,
-              startMinutes: parseMilitaryTime(event.startTime),
-            }))
+            .map((event) => {
+              const parsedStart = parseClockTime(event.startTime);
+              const parsedEnd = parseClockTime(event.endTime);
+
+              return {
+                id: event.id,
+                name: event.name.trim(),
+                startTime: parsedStart.display,
+                endTime: parsedEnd.display,
+                startMinutes: parsedStart.totalMinutes,
+                endMinutes: parsedEnd.totalMinutes,
+              };
+            })
             .sort((left, right) => {
               if (left.startMinutes !== right.startMinutes) {
                 return left.startMinutes - right.startMinutes;
@@ -466,6 +561,12 @@ export default function App() {
       events: label.events.map((event) => ({
         ...event,
         nameLayout: getEventNameLayout(event.name, label.events.length > 1, previewCtx),
+        timeLayout: getEventTimeLayout(
+          event.startTime,
+          event.endTime,
+          label.events.length > 1,
+          previewCtx,
+        ),
       })),
     }));
   }, [printableLabels, fontMetricsVersion]);
@@ -498,16 +599,25 @@ export default function App() {
           return event;
         }
 
-        if (field === 'startTime' || field === 'endTime') {
-          return {
-            ...event,
-            [field]: sanitizeTimeInput(value),
-          };
+        return {
+          ...event,
+          [field]: value,
+        };
+      }),
+    }));
+  }
+
+  function handleTimeBlur(dayId, eventId, field) {
+    updateDay(dayId, (day) => ({
+      ...day,
+      events: day.events.map((event) => {
+        if (event.id !== eventId) {
+          return event;
         }
 
         return {
           ...event,
-          [field]: value,
+          [field]: normalizeTimeInput(event[field]),
         };
       }),
     }));
@@ -633,7 +743,7 @@ export default function App() {
               onClick={handleExportPdf}
               disabled={!canOutput || isExporting}
             >
-              {isExporting ? 'Exporting PDF...' : 'Export PDF'}
+              {isExporting ? 'Exporting PDF…' : 'Export PDF'}
             </button>
             <button
               className="secondary-button"
@@ -651,11 +761,11 @@ export default function App() {
               event(s)
             </span>
             <span>{totalPages} page(s)</span>
-            <span>24-hour time format</span>
+            <span>12-hour time format</span>
           </div>
           <p className="helper-copy">
-            Use four-digit military time like <strong>0900</strong> and{' '}
-            <strong>1300</strong>. Output buttons unlock once every filled event is valid.
+            Use regular times like <strong>9:00 AM</strong> and <strong>1:00 PM</strong>.
+            Output buttons unlock once every filled event is valid.
           </p>
           {exportMessage ? <p className="success-banner">{exportMessage}</p> : null}
           {exportError ? <p className="error-banner">{exportError}</p> : null}
@@ -722,9 +832,8 @@ export default function App() {
                           <span>Start</span>
                           <input
                             type="text"
-                            inputMode="numeric"
-                            placeholder="0900"
-                            maxLength={4}
+                            inputMode="text"
+                            placeholder="9:00 AM"
                             value={event.startTime}
                             onChange={(inputEvent) =>
                               handleEventChange(
@@ -734,6 +843,7 @@ export default function App() {
                                 inputEvent.target.value,
                               )
                             }
+                            onBlur={() => handleTimeBlur(day.id, event.id, 'startTime')}
                           />
                         </label>
 
@@ -741,9 +851,8 @@ export default function App() {
                           <span>End</span>
                           <input
                             type="text"
-                            inputMode="numeric"
-                            placeholder="1300"
-                            maxLength={4}
+                            inputMode="text"
+                            placeholder="1:00 PM"
                             value={event.endTime}
                             onChange={(inputEvent) =>
                               handleEventChange(
@@ -753,6 +862,7 @@ export default function App() {
                                 inputEvent.target.value,
                               )
                             }
+                            onBlur={() => handleTimeBlur(day.id, event.id, 'endTime')}
                           />
                         </label>
                       </div>
